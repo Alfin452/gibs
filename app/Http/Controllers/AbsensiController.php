@@ -95,7 +95,7 @@ class AbsensiController extends Controller
         // 2. Setup Data Default
         // Karena kita "Developer Mode" (Bypass Login), kita hardcode ID Guru = 1 (Pak Budi)
         // Nanti kalau sudah fix login, ganti jadi: Auth::user()->guru->id_guru
-        $id_guru = 1;
+        $id_guru = 46;
 
         // Cari Tahun Ajar yang Aktif
         $tahun_ajar = \App\Models\TahunAjar::where('status', 'Aktif')->first();

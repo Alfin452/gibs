@@ -14,17 +14,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50 text-gray-900">
 
-    <div class="min-h-screen flex">
+    <div class="min-h-screen flex flex-row">
 
         @include('layouts.sidebar')
 
-        <main class="flex-1 md:ml-64 transition-all duration-300">
+        <main class="flex-1 md:ml-64 min-h-screen flex flex-col transition-all duration-300">
 
-            <div class="md:hidden bg-white h-16 border-b flex items-center justify-between px-4">
-                <span class="font-bold text-lg">PORTAL GIBS</span>
-                <button class="text-gray-500 focus:outline-none">
+            <div class="md:hidden h-16 bg-white border-b flex items-center justify-between px-4 sticky top-0 z-40">
+                <span class="font-bold text-lg text-indigo-600">PORTAL GIBS</span>
+                <button class="text-gray-500 p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                     </svg>
@@ -32,20 +32,26 @@
             </div>
 
             @if (isset($header))
-            <header class="bg-white shadow-sm">
+            <header class="bg-white shadow-sm sticky top-0 z-30">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
             </header>
             @endif
 
-            <div class="py-6">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex-1 p-6">
+                <div class="max-w-7xl mx-auto">
                     {{ $slot }}
                 </div>
             </div>
+
+            <footer class="py-4 text-center text-xs text-gray-400">
+                &copy; {{ date('Y') }} Portal GIBS. All rights reserved.
+            </footer>
+
         </main>
     </div>
+
 </body>
 
 </html>
