@@ -4,13 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AbsensiController;
 use Illuminate\Support\Facades\Route;
 
-// --- HALAMAN DEPAN ---
+
 Route::get('/', function () {
-    return redirect()->route('absensi.index'); // Langsung lempar ke absensi aja biar cepat
+    return redirect()->route('absensi.index');
 });
 
-// --- RUTE BAWAAN BREEZE (BIARKAN SAJA) ---
-// Hapus ->middleware(['auth', 'verified'])
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
@@ -23,12 +21,11 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-// ==========================================
-// RUTE ABSENSI (KITA TARUH LUAR SUPAYA BEBAS AKSES)
-// ==========================================
+
 Route::prefix('absensi')->name('absensi.')->group(function () {
     Route::get('/', [AbsensiController::class, 'index'])->name('index');
     Route::get('/buat-baru', [AbsensiController::class, 'create'])->name('create');
     Route::post('/cek-lembar', [AbsensiController::class, 'cekLembar'])->name('cek');
     Route::post('/store', [AbsensiController::class, 'store'])->name('store');
-});
+    Route::get('/edit/{id_kelas}/{id_mapel}/{tanggal}', [AbsensiController::class, 'edit'])->name('edit');
+    });

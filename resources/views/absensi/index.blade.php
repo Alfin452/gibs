@@ -68,7 +68,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-bold text-gray-400">{{ $data->libur }}</td>
 
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                <button class="text-indigo-600 hover:text-indigo-900" disabled title="Coming Soon">Detail</button>
+                                <a href="{{ route('absensi.edit', [
+        'id_kelas' => $data->id_kelas, 
+        'id_mapel' => $data->id_mapel, 
+        'tanggal' => $data->tanggal
+    ]) }}" class="text-indigo-600 hover:text-indigo-900 font-bold hover:underline">
+                                    Detail / Edit
+                                </a>
                             </td>
                         </tr>
                         @empty

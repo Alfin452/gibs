@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class AbsensiController extends Controller
 {
-    // 1. MENAMPILKAN HALAMAN UTAMA (REKAP PER TANGGAL)
     public function index()
     {
         $riwayat = KehadiranHarian::select(
@@ -35,17 +34,25 @@ class AbsensiController extends Controller
         return view('absensi.index', compact('riwayat'));
     }
 
-    // 2. MENAMPILKAN FORM FILTER (PILIH MAPEL & KELAS)
     public function create()
     {
-        // Ambil data untuk Dropdown
-        $mapels = Mapel::all();
-        $kelas = Kelas::all();
+        $id_guru_aktif = 15;
+
+        $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
+            ->with(['mapel', 'kelas']) // Load relasinya
+            ->get();
+
+        if ($jadwal_guru->isEmpty()) {
+            return redirect()->route('absensi.index')->with('warning', 'Guru ID ' . $id_guru_aktif . ' tidak memiliki jadwal mengajar!');
+        }
+
+        $mapels = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
+
+        $kelas = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
 
         return view('absensi.create', compact('mapels', 'kelas'));
     }
 
-    // 3. LOGIKA UNTUK MENAMPILKAN LEMBAR ABSENSI (LIST SISWA)
     public function cekLembar(Request $request)
     {
         $request->validate([
@@ -71,17 +78,13 @@ class AbsensiController extends Controller
             ->orderBy('nama_siswa', 'asc')
             ->get();
 
-        // Ambil info detail mapel & kelas buat judul
         $infoKelas = Kelas::find($id_kelas);
         $infoMapel = Mapel::find($id_mapel);
 
-        // Kirim data ke view Form Input
         return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel'));
     }
 
-    // ... (kode atas tetap sama)
 
-    // 4. SIMPAN DATA ABSENSI (LOGIKA UTAMA)
     public function store(Request $request)
     {
         // 1. Validasi Input
@@ -89,27 +92,20 @@ class AbsensiController extends Controller
             'tanggal' => 'required|date',
             'id_kelas' => 'required',
             'id_mapel' => 'required',
-            'status'   => 'required|array', // Array status per siswa
+            'status'   => 'required|array', 
         ]);
 
         // 2. Setup Data Default
-        // Karena kita "Developer Mode" (Bypass Login), kita hardcode ID Guru = 1 (Pak Budi)
-        // Nanti kalau sudah fix login, ganti jadi: Auth::user()->guru->id_guru
-        $id_guru = 46;
+        $id_guru = 15;
 
-        // Cari Tahun Ajar yang Aktif
         $tahun_ajar = \App\Models\TahunAjar::where('status', 'Aktif')->first();
         $id_tahun_ajar = $tahun_ajar ? $tahun_ajar->id_tahun_ajar : 1; // Fallback ke 1 kalau tidak ketemu
 
-        // Gunakan Database Transaction biar aman (kalau gagal satu, batal semua)
         DB::beginTransaction();
 
         try {
-            // 3. Loop setiap siswa yang diabsen
             foreach ($request->status as $id_siswa => $status_kode) {
 
-                // A. SIMPAN KE TABEL HARIAN (TABEL BARU)
-                // Kita pakai updateOrCreate supaya kalau diedit tidak dobel
                 KehadiranHarian::updateOrCreate(
                     [
                         'tanggal'  => $request->tanggal,
@@ -125,31 +121,43 @@ class AbsensiController extends Controller
                     ]
                 );
 
-                // B. SINKRONISASI KE TABEL LAMA (kehadiran_bulanan)
-                // Ini supaya Erapor Native tetap bisa baca rekapnya
                 $this->updateRekapBulanan($id_siswa, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
             }
 
-            DB::commit(); // Simpan permanen jika sukses
+            DB::commit(); 
 
             return redirect()->route('absensi.index')->with('success', 'Absensi berhasil disimpan dan disinkronkan ke Erapor!');
         } catch (\Exception $e) {
-            DB::rollback(); // Batalkan semua jika ada error
+            DB::rollback(); 
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    /**
-     * FUNGSI TAMBAHAN: updateRekapBulanan
-     * Tugasnya menghitung ulang jumlah H/S/I/A di bulan tersebut lalu update tabel lama.
-     */
+    public function edit($id_kelas, $id_mapel, $tanggal)
+    {
+        // 1. Ambil Info Kelas & Mapel untuk Judul
+        $infoKelas = Kelas::find($id_kelas);
+        $infoMapel = Mapel::find($id_mapel);
+
+        // 2. Ambil Daftar Siswa di Kelas tersebut
+        $siswa = Siswa::where('id_kelas', $id_kelas)
+            ->orderBy('nama_siswa', 'asc')
+            ->get();
+
+        // 3. AMBIL DATA KEHADIRAN YANG SUDAH ADA
+        $dataKehadiran = KehadiranHarian::where('tanggal', $tanggal)
+            ->where('id_kelas', $id_kelas)
+            ->where('id_mapel', $id_mapel)
+            ->get()
+            ->keyBy('id_siswa'); 
+
+        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'dataKehadiran'));
+    }
+
     private function updateRekapBulanan($id_siswa, $id_mapel, $id_kelas, $id_tahun_ajar, $tanggal, $id_guru)
     {
-        // 1. Tentukan Periode (Format MM-YYYY sesuai tabel native)
         $periode = date('m-Y', strtotime($tanggal));
 
-        // 2. Hitung jumlah H/S/I/A dari tabel harian untuk bulan ini
-        // NOTE: Status 'L' (Libur) TIDAK DIHITUNG di sini agar tidak merusak persentase kehadiran siswa
         $stats = KehadiranHarian::where('id_siswa', $id_siswa)
             ->where('id_mapel', $id_mapel)
             ->whereRaw("DATE_FORMAT(tanggal, '%m-%Y') = ?", [$periode])
@@ -161,9 +169,7 @@ class AbsensiController extends Controller
             ")
             ->first();
 
-        // 3. Update tabel lama (kehadiran_bulanan)
-        // Kita pakai model KehadiranBulanan (Pastikan model ini sudah dibuat)
-        // Jika belum ada modelnya, kita pakai Query Builder biasa biar aman
+        
         DB::table('kehadiran_bulanan')->updateOrInsert(
             [
                 'id_siswa' => $id_siswa,
@@ -178,7 +184,7 @@ class AbsensiController extends Controller
                 'izin'             => $stats->total_izin,
                 'tanpa_keterangan' => $stats->total_alpha,
                 'id_guru'          => $id_guru,
-                'is_lock'          => 0 // Default tidak dikunci
+                'is_lock'          => 0 
             ]
         );
     }

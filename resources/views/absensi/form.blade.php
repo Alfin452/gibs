@@ -48,6 +48,15 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach($siswa as $index => $s)
+
+                            {{-- LOGIKA PENENTUAN STATUS --}}
+                            @php
+                            // Cek apakah ada data lama ($dataKehadiran dikirim dari controller edit)
+                            // Kalau tidak ada (input baru), default null atau 'H' sesuai selera
+                            $statusDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->status ?? 'H') : 'H';
+                            $ketDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->keterangan ?? '') : '';
+                            @endphp
+
                             <tr class="hover:bg-gray-50 transition-colors group">
                                 <td class="px-4 py-3 text-gray-500">{{ $index + 1 }}</td>
                                 <td class="px-4 py-3">
@@ -56,30 +65,46 @@
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <div class="flex justify-center gap-1 bg-gray-100 p-1 rounded-lg">
+
+                                        {{-- HADIR --}}
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="H" class="peer sr-only radio-status" checked>
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="H" class="peer sr-only radio-status"
+                                                {{ $statusDB == 'H' ? 'checked' : '' }}>
                                             <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-green-500 peer-checked:text-white transition-all">H</div>
                                         </label>
+
+                                        {{-- SAKIT --}}
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="S" class="peer sr-only radio-status">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="S" class="peer sr-only radio-status"
+                                                {{ $statusDB == 'S' ? 'checked' : '' }}>
                                             <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all">S</div>
                                         </label>
+
+                                        {{-- IZIN --}}
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="I" class="peer sr-only radio-status">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="I" class="peer sr-only radio-status"
+                                                {{ $statusDB == 'I' ? 'checked' : '' }}>
                                             <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-yellow-500 peer-checked:text-white transition-all">I</div>
                                         </label>
+
+                                        {{-- ALPHA --}}
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="A" class="peer sr-only radio-status">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="A" class="peer sr-only radio-status"
+                                                {{ $statusDB == 'A' ? 'checked' : '' }}>
                                             <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-red-500 peer-checked:text-white transition-all">A</div>
                                         </label>
+
+                                        {{-- LIBUR --}}
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="L" class="peer sr-only radio-status">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="L" class="peer sr-only radio-status"
+                                                {{ $statusDB == 'L' ? 'checked' : '' }}>
                                             <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-gray-500 peer-checked:text-white transition-all">L</div>
                                         </label>
+
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <input type="text" name="keterangan[{{ $s->id_siswa }}]" placeholder="Catatan..."
+                                    <input type="text" name="keterangan[{{ $s->id_siswa }}]" value="{{ $ketDB }}" placeholder="Catatan..."
                                         class="w-full text-sm border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500">
                                 </td>
                             </tr>
