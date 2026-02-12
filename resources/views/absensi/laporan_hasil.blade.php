@@ -62,9 +62,7 @@
                             </th>
 
                             <th rowspan="2" class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider border-r min-w-[250px] sticky left-14 z-30 bg-gray-50 shadow-md">
-                                Nama Siswa
-                            </th>
-                            
+                                         
                             @foreach($tanggal_pertemuan as $tgl)
                             <th class="px-2 py-2 text-center font-bold text-gray-700 border-r min-w-[45px]">
                                 {{ date('d', strtotime($tgl)) }}
@@ -147,6 +145,10 @@
                             <td class="px-2 py-2 text-center font-bold bg-indigo-50/20 border-r {{ $colorPersen }}">{{ $persen }}%</td>
                         </tr>
                         @endforeach
+                        </td>
+                            @endforeach
+                            </tr>
+                            @endforeach
                     </tbody>
                 </table>
             </div>
