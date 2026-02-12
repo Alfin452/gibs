@@ -1,43 +1,101 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-900 leading-tight">
-            {{ __('Input Kehadiran') }}
+            {{ __('Input Kehadiran Baru') }}
         </h2>
     </x-slot>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+    
+    <style>
+        /* --- Modern Flatpickr Overrides --- */
+        .flatpickr-calendar {
+            background: #ffffff;
+            box-shadow: none !important;
+            border: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0;
+        }
+        .flatpickr-months {
+            margin-bottom: 0.5rem;
+            padding-top: 0.5rem;
+        }
+        .flatpickr-current-month {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            font-weight: 700;
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
+            fill: #6366f1 !important;
+            padding: 10px;
+            top: 5px;
+        }
+        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+            background: #eef2ff;
+        }
+        span.flatpickr-weekday {
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .flatpickr-day {
+            border-radius: 0.5rem !important;
+            border: 1px solid transparent;
+            font-weight: 500;
+            color: #d1d5db; /* Default disabled */
+            height: 40px;
+            line-height: 40px;
+            margin-top: 2px;
+            transition: all 0.2s ease;
+        }
+        /* Tanggal Aktif (Enabled) */
+        .flatpickr-day:not(.flatpickr-disabled) {
+            color: #374151;
+            background: #f3f4f6;
+            font-weight: 700;
+        }
+        .flatpickr-day:not(.flatpickr-disabled):hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        /* Tanggal Terpilih */
+        .flatpickr-day.selected, .flatpickr-day.selected:hover {
+            background: #4f46e5 !important;
+            color: #ffffff !important;
+            border-color: #4f46e5 !important;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        .flatpickr-day.today {
+            border-color: #e5e7eb;
+        }
+    </style>
 
-    <div class="py-2">
-        <div class="max-w-[85rem] mx-auto px-2 sm:px-6 lg:px-2">
-
-            <form action="{{ route('absensi.cek') }}" method="POST">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <form action="{{ route('absensi.cek') }}" method="POST" id="form-absensi">
                 @csrf
+                <input type="hidden" name="id_mapel" id="id_mapel" required>
+                <input type="hidden" name="id_kelas" id="id_kelas" required>
+                <input type="hidden" name="kombinasi_jadwal" id="kombinasi_jadwal">
 
-                <div class="bg-white border border-gray-100 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] overflow-hidden">
-
-                    <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900">Parameter Absensi</h3>
-                            <p class="text-sm text-gray-500">Pilih Mapel & Kelas, lalu pilih tanggal di kalender.</p>
-                        </div>
-
-                        <div id="status-indicator" class="hidden inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100 animate-pulse">
-                            <svg class="animate-spin -ml-1 mr-2 h-3 w-3 text-indigo-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Mencari Jadwal...
-                        </div>
-                    </div>
-
-                    <div class="p-6 md:p-8 space-y-8">
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Bulan</label>
-                                <div class="relative">
-                                    <select id="bulan" class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all cursor-pointer filter-trigger shadow-sm hover:border-gray-300">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
+                                Pilih Periode
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Bulan</label>
+                                    <select id="bulan" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all filter-trigger cursor-pointer">
                                         @foreach(range(1, 12) as $m)
                                         <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
                                             {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
@@ -45,12 +103,9 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Tahun</label>
-                                <div class="relative">
-                                    <select id="tahun" class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all cursor-pointer filter-trigger shadow-sm hover:border-gray-300">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Tahun</label>
+                                    <select id="tahun" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all filter-trigger cursor-pointer">
                                         @php $cy = date('Y'); @endphp
                                         <option value="{{ $cy }}">{{ $cy }}</option>
                                         <option value="{{ $cy-1 }}">{{ $cy-1 }}</option>
@@ -59,66 +114,112 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Mata Pelajaran</label>
-                                <div class="relative">
-                                    <select name="id_mapel" id="id_mapel" required class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all cursor-pointer filter-trigger shadow-sm hover:border-gray-300">
-                                        <option value="">-- Pilih Mapel --</option>
-                                        @if(isset($mapels) && count($mapels) > 0)
-                                        @foreach($mapels as $m)
-                                        <option value="{{ $m->id_mapel }}">{{ $m->nama_mapel }}</option>
-                                        @endforeach
-                                        @else
-                                        <option value="" disabled>Data Mapel Tidak Ditemukan</option>
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 px-1">
+                                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
+                                Pilih Kelas & Mapel
+                            </h3>
+                            
+                            @if(isset($daftar_jadwal) && count($daftar_jadwal) > 0)
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    @foreach($daftar_jadwal as $jadwal)
+                                    <div 
+                                        class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-indigo-500 hover:shadow-md hover:ring-2 hover:ring-indigo-500/20 rounded-xl p-5 transition-all duration-200 relative overflow-hidden"
+                                        onclick="pilihJadwal(this, '{{ $jadwal->id_mapel }}', '{{ $jadwal->id_kelas }}', '{{ $jadwal->mapel->nama_mapel }}', '{{ $jadwal->kelas->nama_kelas }}')"
+                                    >
+                                        <div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                            <span class="text-9xl font-bold">#</span>
+                                        </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Kelas Target</label>
-                                <div class="relative">
-                                    <select name="id_kelas" id="id_kelas" required class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all cursor-pointer filter-trigger shadow-sm hover:border-gray-300">
-                                        <option value="">-- Pilih Kelas --</option>
-                                        @if(isset($kelas) && count($kelas) > 0)
-                                        @foreach($kelas as $k)
-                                        <option value="{{ $k->id_kelas }}">{{ $k->nama_kelas }}</option>
-                                        @endforeach
-                                        @else
-                                        <option value="" disabled>Data Kelas Tidak Ditemukan</option>
-                                        @endif
-                                    </select>
-                                    <input type="hidden" name="kombinasi_jadwal" id="kombinasi_jadwal">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-gray-100 pt-6">
-                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 ml-1">Pilih Tanggal Pertemuan (Kalender)</label>
-
-                            <div class="flex flex-col md:flex-row gap-4 items-stretch">
-                                <div class="relative flex-grow">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
+                                        <div class="relative z-10">
+                                            <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-1">{{ $jadwal->kelas->nama_kelas }}</p>
+                                            <h4 class="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $jadwal->mapel->nama_mapel }}</h4>
+                                        </div>
+                                        
+                                        <div class="checkmark hidden absolute top-4 right-4 bg-indigo-600 text-white rounded-full p-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
                                     </div>
-                                    <input type="text" name="tanggal" id="tanggal" required disabled
-                                        class="pl-10 block w-full rounded-xl border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed shadow-inner focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 font-medium transition-all"
-                                        placeholder="-- Pilih Mapel & Kelas dahulu --">
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                                    <p class="text-sm text-yellow-700">Anda belum memiliki jadwal mengajar.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="sticky top-6 space-y-6">
+                            
+                            <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden relative">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                                    <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                                        <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        Pilih Tanggal
+                                    </h3>
+                                    <p class="text-indigo-100 text-xs mt-1">Hanya tanggal jadwal aktif yang bisa dipilih.</p>
                                 </div>
 
-                                <button type="submit" id="btn-submit" disabled class="md:w-auto w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-bold rounded-xl text-white bg-gray-300 cursor-not-allowed transition-all shadow-none focus:outline-none focus:ring-4 focus:ring-indigo-100 gap-2">
-                                    <span>Buka Absensi</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p id="helper-text" class="text-xs text-gray-400 mt-2 ml-1">Kalender akan aktif otomatis setelah filter dipilih.</p>
-                        </div>
+                                <div class="p-4 relative min-h-[340px]">
+                                    <div id="loading-indicator" class="hidden absolute inset-0 z-20 bg-white/90 backdrop-blur-[1px] flex flex-col items-center justify-center transition-all duration-300">
+                                        <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
+                                        <span class="text-xs font-bold text-gray-500 animate-pulse">Mengecek Jadwal...</span>
+                                    </div>
+                                    
+                                    <input type="text" name="tanggal" id="tanggal" class="hidden">
+                                </div>
 
+                                <div class="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-gray-200 border border-gray-300"></span>
+                                        <span>Kosong</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 shadow-sm"></span>
+                                        <span class="font-bold text-gray-700">Jadwal Ada</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="calendar-status" class="text-center text-xs h-4"></div>
+
+                            <div id="selection-preview" class="hidden transition-all duration-500 transform translate-y-4 opacity-0">
+                                <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-16 h-16 bg-indigo-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                                    <div class="relative z-10">
+                                        <p class="text-xs text-indigo-500 font-bold uppercase tracking-wider mb-2">Konfirmasi</p>
+                                        
+                                        <div class="space-y-1 mb-4">
+                                            <div class="flex justify-between items-end border-b border-gray-100 pb-2">
+                                                <span class="text-gray-500 text-sm">Kelas</span>
+                                                <span class="font-bold text-gray-900" id="preview-kelas">-</span>
+                                            </div>
+                                            <div class="flex justify-between items-end border-b border-gray-100 pb-2">
+                                                <span class="text-gray-500 text-sm">Mapel</span>
+                                                <span class="font-bold text-gray-900 text-right w-2/3 truncate" id="preview-mapel">-</span>
+                                            </div>
+                                            <div class="flex justify-between items-end pt-2">
+                                                <span class="text-gray-500 text-sm">Tanggal</span>
+                                                <span class="font-bold text-indigo-600" id="preview-tanggal">-</span>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" id="btn-submit" 
+                                            class="w-full group relative flex items-center justify-center px-6 py-3.5 border border-transparent text-sm font-bold rounded-xl text-white bg-gray-900 hover:bg-indigo-600 transition-all shadow-lg hover:shadow-indigo-500/30">
+                                            <span>Buka Absensi</span>
+                                            <svg class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="empty-state-action" class="text-center py-8">
+                                <p class="text-sm text-gray-400">Silakan pilih kelas terlebih dahulu.</p>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </form>
@@ -128,201 +229,127 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <script>
+        let fpInstance;
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Referensi Elemen DOM
-            const mapelSelect = document.getElementById('id_mapel');
-            const kelasSelect = document.getElementById('id_kelas');
-            const bulanSelect = document.getElementById('bulan');
-            const tahunSelect = document.getElementById('tahun');
+            // Inisialisasi Flatpickr
             const tanggalInput = document.getElementById('tanggal');
-            const btnSubmit = document.getElementById('btn-submit');
-            const kombinasiInput = document.getElementById('kombinasi_jadwal');
-
-            const statusIndicator = document.getElementById('status-indicator');
-            const helperText = document.getElementById('helper-text');
-
-            // 1. Inisialisasi Flatpickr
-            // HAPUS konfigurasi 'disable' di sini agar tidak bentrok.
-            // Kita andalkan atribut 'disabled' pada tag <input> HTML.
-            let fpInstance = flatpickr(tanggalInput, {
+            
+            fpInstance = flatpickr(tanggalInput, {
                 locale: 'id',
                 dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "l, d F Y",
-                // Kita tidak set 'disable' di sini, kita atur dinamis nanti
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (dateStr) {
-                        enableSubmit();
-                    } else {
-                        disableSubmit();
+                inline: true, // Wajib TRUE agar muncul langsung
+                animate: true,
+                onChange: function(selectedDates, dateStr) {
+                    if(dateStr) {
+                        showConfirmationPanel(selectedDates[0]);
                     }
                 }
             });
 
-            // 2. Fungsi Utama Fetch Data Jadwal
-            async function fetchTanggal() {
-                const mapel = mapelSelect.value;
-                const kelas = kelasSelect.value;
-                const bulan = bulanSelect.value;
-                const tahun = tahunSelect.value;
-
-                // Update input hidden untuk keperluan controller
-                if (mapel && kelas) {
-                    kombinasiInput.value = `${kelas}-${mapel}`;
-                } else {
-                    kombinasiInput.value = "";
-                }
-
-                // Jika filter belum lengkap, reset dan return
-                if (!mapel || !kelas) {
-                    resetUI();
-                    return;
-                }
-
-                setLoading(true);
-
-                try {
-                    // Request ke Server
-                    const url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`;
-
-                    const response = await fetch(url);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+            // Listener untuk perubahan Bulan/Tahun
+            document.querySelectorAll('.filter-trigger').forEach(el => {
+                el.addEventListener('change', function() {
+                    if(document.getElementById('id_mapel').value) {
+                        fetchTanggalAvailable();
                     }
-
-                    const data = await response.json();
-                    const allowedDates = [];
-
-                    // Logika Penerapan Tanggal
-                    if (data && data.length > 0) {
-                        // KASUS A: Jadwal Ditemukan
-                        data.forEach(item => {
-                            allowedDates.push(item.tanggal);
-                        });
-
-                        // Set Tanggal yang boleh dipilih
-                        fpInstance.set('enable', allowedDates);
-
-                        updateStatus(`${allowedDates.length} Tanggal Jadwal Ditemukan`, 'green');
-                    } else {
-                        // KASUS B: Jadwal Kosong
-                        // Kita izinkan SEMUA tanggal agar user tidak terblokir
-                        fpInstance.set('enable', []); // Enable All
-
-                        updateStatus('Jadwal spesifik tidak ditemukan. Mode bebas aktif.', 'orange');
-                    }
-
-                    // PENTING: Buka Kunci Input Secara Visual & Fungsional
-                    enableInputVisual();
-
-                } catch (error) {
-                    console.error('Fetch Error:', error);
-                    // KASUS C: Error Koneksi
-                    // Tetap buka input sebagai fallback
-                    fpInstance.set('enable', []);
-                    enableInputVisual();
-
-                    updateStatus('Gagal mengambil jadwal (Mode Bebas).', 'red');
-                } finally {
-                    setLoading(false);
-                }
-            }
-
-            // --- Helper Functions ---
-
-            function enableInputVisual() {
-                // 1. Buka input asli
-                tanggalInput.disabled = false;
-
-                // 2. Buka input visual Flatpickr (Alt Input)
-                // Ini yang dilihat oleh user, jadi kelas CSS harus diubah di sini
-                if (fpInstance.altInput) {
-                    fpInstance.altInput.disabled = false;
-                    fpInstance.altInput.classList.remove('bg-gray-50', 'text-gray-400', 'cursor-not-allowed');
-                    fpInstance.altInput.classList.add('bg-white', 'text-gray-900', 'cursor-pointer', 'border-indigo-300');
-                } else {
-                    // Fallback jika altInput tidak ada (jarang terjadi jika altInput: true)
-                    tanggalInput.classList.remove('bg-gray-50', 'text-gray-400', 'cursor-not-allowed');
-                    tanggalInput.classList.add('bg-white', 'text-gray-900', 'cursor-pointer', 'border-indigo-300');
-                }
-
-                tanggalInput.placeholder = "Klik untuk pilih tanggal...";
-                if (fpInstance.altInput) fpInstance.altInput.placeholder = "Klik untuk pilih tanggal...";
-            }
-
-            function disableInputVisual() {
-                tanggalInput.disabled = true;
-
-                if (fpInstance.altInput) {
-                    fpInstance.altInput.disabled = true;
-                    fpInstance.altInput.classList.add('bg-gray-50', 'text-gray-400', 'cursor-not-allowed');
-                    fpInstance.altInput.classList.remove('bg-white', 'text-gray-900', 'cursor-pointer', 'border-indigo-300');
-                    fpInstance.altInput.placeholder = "-- Pilih Mapel & Kelas dahulu --";
-                }
-
-                tanggalInput.classList.add('bg-gray-50', 'text-gray-400', 'cursor-not-allowed');
-                tanggalInput.classList.remove('bg-white', 'text-gray-900', 'cursor-pointer', 'border-indigo-300');
-                tanggalInput.placeholder = "-- Pilih Mapel & Kelas dahulu --";
-            }
-
-            function setLoading(isLoading) {
-                if (isLoading) {
-                    statusIndicator.classList.remove('hidden');
-
-                    // Kunci sementara loading
-                    tanggalInput.disabled = true;
-                    if (fpInstance.altInput) {
-                        fpInstance.altInput.disabled = true;
-                        fpInstance.altInput.placeholder = "Sedang mengecek jadwal...";
-                    }
-
-                } else {
-                    statusIndicator.classList.add('hidden');
-                    // Kita tidak otomatis buka di sini, karena 'enableInputVisual' dipanggil di blok try/catch
-                }
-            }
-
-            function updateStatus(text, color) {
-                helperText.textContent = text;
-                if (color === 'green') {
-                    helperText.className = 'text-xs mt-2 ml-1 text-indigo-600 font-bold';
-                } else if (color === 'orange') {
-                    helperText.className = 'text-xs mt-2 ml-1 text-orange-500 font-bold';
-                } else if (color === 'red') {
-                    helperText.className = 'text-xs mt-2 ml-1 text-red-500 font-bold';
-                } else {
-                    helperText.className = 'text-xs mt-2 ml-1 text-gray-500';
-                }
-            }
-
-            function resetUI() {
-                disableInputVisual();
-                disableSubmit();
-                fpInstance.clear();
-
-                helperText.textContent = 'Jadwal akan muncul otomatis setelah filter dipilih.';
-                helperText.className = 'text-xs text-gray-400 mt-2 ml-1';
-            }
-
-            function enableSubmit() {
-                btnSubmit.disabled = false;
-                btnSubmit.classList.remove('bg-gray-300', 'cursor-not-allowed', 'shadow-none', 'text-white');
-                btnSubmit.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'shadow-lg', 'shadow-indigo-200', 'text-white', 'transform', 'hover:-translate-y-0.5');
-            }
-
-            function disableSubmit() {
-                btnSubmit.disabled = true;
-                btnSubmit.classList.add('bg-gray-300', 'cursor-not-allowed', 'shadow-none', 'text-white');
-                btnSubmit.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'shadow-lg', 'shadow-indigo-200', 'transform', 'hover:-translate-y-0.5');
-            }
-
-            // Event Listeners
-            const filters = document.querySelectorAll('.filter-trigger');
-            filters.forEach(el => el.addEventListener('change', fetchTanggal));
-
-            // Initial State Check
-            resetUI();
+                });
+            });
         });
+
+        // Function dipanggil saat Card Kelas diklik
+        function pilihJadwal(el, idMapel, idKelas, namaMapel, namaKelas) {
+            // Visual Update Card
+            document.querySelectorAll('.jadwal-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+                card.querySelector('.checkmark').classList.add('hidden');
+            });
+            el.classList.add('ring-2', 'ring-indigo-600', 'bg-indigo-50', 'border-indigo-600');
+            el.querySelector('.checkmark').classList.remove('hidden');
+
+            // Update Input Hidden
+            document.getElementById('id_mapel').value = idMapel;
+            document.getElementById('id_kelas').value = idKelas;
+            document.getElementById('kombinasi_jadwal').value = `${idKelas}-${idMapel}`;
+
+            // Update Teks Preview
+            document.getElementById('preview-mapel').innerText = namaMapel;
+            document.getElementById('preview-kelas').innerText = namaKelas;
+
+            // Reset Panel Bawah
+            document.getElementById('selection-preview').classList.add('hidden');
+            document.getElementById('empty-state-action').classList.remove('hidden');
+
+            // Fetch Jadwal
+            fetchTanggalAvailable();
+        }
+
+        async function fetchTanggalAvailable() {
+            const mapel = document.getElementById('id_mapel').value;
+            const kelas = document.getElementById('id_kelas').value;
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            
+            const loading = document.getElementById('loading-indicator');
+            const statusText = document.getElementById('calendar-status');
+
+            if (!mapel || !kelas) return;
+
+            // Tampilkan Loading
+            loading.classList.remove('hidden');
+            statusText.innerText = "";
+            
+            // Disable kalender sementara
+            document.getElementById('tanggal').disabled = true;
+
+            try {
+                // Gunakan Blade route di sini agar URL pasti benar
+                const url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Gagal mengambil data");
+
+                const data = await response.json();
+                const validDates = data.map(item => item.tanggal);
+
+                // Update Flatpickr
+                fpInstance.clear();
+                
+                if (validDates.length > 0) {
+                    fpInstance.set('enable', validDates);
+                    statusText.innerHTML = `<span class="text-green-600 font-bold">✓ Tersedia ${validDates.length} hari pertemuan.</span>`;
+                } else {
+                    fpInstance.set('enable', []); // Tidak ada jadwal
+                    statusText.innerHTML = `<span class="text-orange-500 font-bold">⚠ Tidak ada jadwal ditemukan bulan ini.</span>`;
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                statusText.innerHTML = `<span class="text-red-500">Gagal memuat jadwal. Cek koneksi.</span>`;
+                // Fallback: enable semua tanggal jika error, supaya user tidak stuck
+                fpInstance.set('enable', []); 
+            } finally {
+                // Sembunyikan Loading (PENTING: ini harus jalan apapun yang terjadi)
+                loading.classList.add('hidden');
+                document.getElementById('tanggal').disabled = false;
+            }
+        }
+
+        function showConfirmationPanel(dateObj) {
+            const panel = document.getElementById('selection-preview');
+            const emptyState = document.getElementById('empty-state-action');
+
+            emptyState.classList.add('hidden');
+            panel.classList.remove('hidden');
+            
+            // Format Tanggal Indonesia
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('preview-tanggal').innerText = dateObj.toLocaleDateString('id-ID', options);
+
+            // Trigger animasi CSS
+            void panel.offsetWidth;
+            panel.classList.remove('translate-y-4', 'opacity-0');
+        }
     </script>
 </x-app-layout>

@@ -42,7 +42,7 @@
             <input type="hidden" name="id_mapel" value="{{ $infoMapel->id_mapel }}">
 
             <div class="bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-200">
-                
+
                 <div class="w-full overflow-hidden rounded-b-xl">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
@@ -73,7 +73,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-medium align-middle">
                                     {{ $index + 1 }}
                                 </td>
-                                
+
                                 <td class="px-6 py-4 align-middle">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
@@ -88,20 +88,32 @@
                                 <td class="px-6 py-4 align-middle">
                                     <div class="flex justify-center items-center gap-1 bg-gray-100 p-1.5 rounded-lg border border-gray-200 shadow-inner">
 
-                                        @foreach(['H' => ['green', 'Hadir'], 'S' => ['blue', 'Sakit'], 'I' => ['yellow', 'Izin'], 'A' => ['red', 'Alpha'], 'L' => ['gray', 'Libur']] as $code => $style)
+                                        @php
+                                        // Definisikan class LENGKAP di sini agar terbaca oleh Tailwind
+                                        $options = [
+                                        'H' => ['bg' => 'peer-checked:bg-green-500', 'hover' => 'hover:text-green-600', 'label' => 'Hadir'],
+                                        'S' => ['bg' => 'peer-checked:bg-blue-500', 'hover' => 'hover:text-blue-600', 'label' => 'Sakit'],
+                                        'I' => ['bg' => 'peer-checked:bg-yellow-500', 'hover' => 'hover:text-yellow-600', 'label' => 'Izin'],
+                                        'A' => ['bg' => 'peer-checked:bg-red-500', 'hover' => 'hover:text-red-600', 'label' => 'Alpha'],
+                                        'L' => ['bg' => 'peer-checked:bg-gray-500', 'hover' => 'hover:text-gray-600', 'label' => 'Libur'],
+                                        ];
+                                        @endphp
+
+                                        @foreach($options as $code => $style)
                                         <label class="cursor-pointer relative group/radio">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="{{ $code }}" 
-                                                class="peer sr-only" {{ $statusDB == $code ? 'checked' : '' }}>
-                                            
-                                            <div class="w-10 h-8 flex items-center justify-center rounded text-xs font-bold text-gray-500 
-                                                hover:bg-white hover:text-gray-700
-                                                peer-checked:bg-{{ $style[0] }}-500 peer-checked:text-white peer-checked:shadow-md 
-                                                transition-all duration-200">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="{{ $code }}"
+                                                class="peer sr-only" {{ (isset($statusDB) && $statusDB == $code) ? 'checked' : '' }}>
+
+                                            <div class="w-10 h-8 flex items-center justify-center rounded text-xs font-bold text-gray-400 border border-transparent
+        hover:bg-gray-50 {{ $style['hover'] }}
+        {{ $style['bg'] }} peer-checked:text-white peer-checked:shadow-md 
+        transition-all duration-200">
                                                 {{ $code }}
                                             </div>
 
-                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/radio:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
-                                                {{ $style[1] }}
+                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover/radio:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-sm">
+                                                {{ $style['label'] }}
+                                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
                                             </div>
                                         </label>
                                         @endforeach
@@ -124,7 +136,9 @@
                         Pastikan semua data siswa telah dicek sebelum menyimpan.
                     </p>
                     <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
                         Simpan Absensi
                     </button>
                 </div>

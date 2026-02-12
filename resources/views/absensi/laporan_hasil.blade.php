@@ -87,7 +87,7 @@
                             <th class="px-3 py-2 text-center text-xs font-bold text-red-700 bg-indigo-50 border-r border-indigo-100" title="Alpha">A</th>
                             <th class="px-3 py-2 text-center text-xs font-bold text-gray-600 bg-indigo-50 border-r border-indigo-100" title="Libur">L</th>
                             <th class="px-3 py-2 text-center text-xs font-bold text-gray-900 bg-indigo-100/50 border-r border-indigo-100" title="Total Data">Total</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-indigo-700 bg-indigo-100/50" title="Persentase Kehadiran">%</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-indigo-700 bg-indigo-100/50" title="Persentase Kehadiran">Persentase %</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -152,7 +152,7 @@
                             <td class="px-2 py-2 text-center font-bold text-gray-500 bg-indigo-50/30 border-r border-indigo-100">{{ $l }}</td>
 
                             <td class="px-2 py-2 text-center font-bold text-gray-800 bg-indigo-100/30 border-r border-indigo-100">{{ $total_input }}</td>
-                            <td class="px-2 py-2 text-center bg-indigo-100/30 {{ $colorPersen }}">{{ $persen }}%</td>
+                            <td class="px-2 py-2 text-center bg-indigo-100/30 {{ $colorPersen }}">{{ $persen }}</td>
                             </tr>
                             @endforeach
                     </tbody>

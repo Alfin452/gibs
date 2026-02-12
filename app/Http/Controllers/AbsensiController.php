@@ -73,29 +73,28 @@ class AbsensiController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->guru) {
-            return redirect()->route('dashboard')->with('error', 'Akun Anda tidak terdaftar sebagai Guru!');
-        }
+    if (!$user->guru) {
+        return redirect()->route('dashboard')->with('error', 'Akun Anda tidak terdaftar sebagai Guru!');
+    }
 
-        $id_guru_aktif = $user->guru->id_guru;
+    $id_guru_aktif = $user->guru->id_guru;
 
-        // Ambil jadwal guru
-        $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
-            ->with(['mapel', 'kelas'])
-            ->get();
+    // Ambil jadwal guru lengkap dengan relasi
+    $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
+        ->with(['mapel', 'kelas'])
+        ->get();
 
-        if ($jadwal_guru->isEmpty()) {
-            return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar.');
-        }
+    if ($jadwal_guru->isEmpty()) {
+        return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar.');
+    }
 
-        // Ambil list unik Mapel dan Kelas dari jadwal
-        $mapels = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
-        $kelas = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
+    // FILTER BARU: Ambil kombinasi unik (Mapel + Kelas)
+    // Kita gunakan unique based on string key agar tidak ada duplikat jika guru mengajar mapel sama di kelas sama di hari berbeda
+    $daftar_jadwal = $jadwal_guru->unique(function ($item) {
+        return $item->id_mapel . '-' . $item->id_kelas;
+    })->values();
 
-        // Debugging (Opsional, hapus nanti):
-        // dd($mapels, $kelas); 
-
-        return view('absensi.create', compact('mapels', 'kelas'));
+    return view('absensi.create', compact('daftar_jadwal'));
     }
 
     public function cekLembar(Request $request)
