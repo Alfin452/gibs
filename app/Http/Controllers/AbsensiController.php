@@ -312,4 +312,64 @@ class AbsensiController extends Controller
             'rekap'
         ));
     }
+
+    public function getTanggalAvailable(Request $request)
+    {
+        $id_kelas = $request->id_kelas;
+        $id_mapel = $request->id_mapel;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        // 1. Cari Hari Mengajar Guru Tersebut di Kelas & Mapel ini
+        // Kita cari jadwal berdasarkan ID Kelas & Mapel (Logika umum jadwal)
+        $jadwal_hari = Jadwal::where('id_kelas', $id_kelas)
+            ->where('id_mapel', $id_mapel)
+            ->pluck('hari')
+            ->toArray();
+
+        // Jika tidak ada jadwal, kembalikan kosong
+        if (empty($jadwal_hari)) {
+            return response()->json([]);
+        }
+
+        // 2. Generate Tanggal di Bulan Tersebut yang Sesuai Hari Mengajar
+        $list_tanggal = [];
+        $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+
+        for ($d = 1; $d <= $jumlah_hari; $d++) {
+            $time = mktime(0, 0, 0, $bulan, $d, $tahun);
+            $date = date('Y-m-d', $time);
+            $nama_hari_inggris = date('l', $time);
+
+            $map_hari = [
+                'Sunday' => 'Minggu',
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu'
+            ];
+            $hari_indo = $map_hari[$nama_hari_inggris] ?? '';
+
+            // Jika hari ini sesuai jadwal
+            if (in_array($hari_indo, $jadwal_hari)) {
+
+                // Cek apakah SUDAH PERNAH DIABSEN?
+                $sudah_absen = KehadiranHarian::where('tanggal', $date)
+                    ->where('id_kelas', $id_kelas)
+                    ->where('id_mapel', $id_mapel)
+                    ->exists();
+
+                $list_tanggal[] = [
+                    'tanggal' => $date,
+                    'hari' => $hari_indo,
+                    'tampilan' => date('d F Y', strtotime($date)) . " ($hari_indo)",
+                    'status' => $sudah_absen ? 'sudah' : 'belum' // Flag untuk UI
+                ];
+            }
+        }
+
+        return response()->json($list_tanggal);
+    }
 }

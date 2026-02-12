@@ -44,7 +44,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit/{id_kelas}/{id_mapel}/{tanggal}', [AbsensiController::class, 'edit'])->name('edit');
         Route::get('/laporan/view', [AbsensiController::class, 'prosesLaporan'])->name('laporan.view');
         Route::get('/laporan', [AbsensiController::class, 'laporan'])->name('laporan');
-    });
+        Route::get('/get-tanggal', [AbsensiController::class, 'getTanggalAvailable'])->name('get-tanggal');
+        });
 });
 
 require __DIR__ . '/auth.php';
