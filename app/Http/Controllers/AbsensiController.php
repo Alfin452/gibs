@@ -79,32 +79,42 @@ class AbsensiController extends Controller
 
         $id_guru_aktif = $user->guru->id_guru;
 
+        // Ambil jadwal lengkap dengan relasi mapel dan kelas
         $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
             ->with(['mapel', 'kelas'])
             ->get();
 
         if ($jadwal_guru->isEmpty()) {
-            return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar di sistem.');
+            return redirect()->route('absensi.index')->with('warning', '...');
         }
 
-        $mapels = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
-        $kelas = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
-
-        return view('absensi.create', compact('mapels', 'kelas'));
+        // Hapus bagian pluck mapels dan kelas yang terpisah.
+        // Kirim langsung $jadwal_guru ke view
+        return view('absensi.create', compact('jadwal_guru'));
     }
 
     public function cekLembar(Request $request)
     {
+        // 1. Validasi dropdown gabungan 'kombinasi_jadwal'
         $request->validate([
             'tanggal' => 'required|date',
-            'id_mapel' => 'required',
-            'id_kelas' => 'required',
+            'kombinasi_jadwal' => 'required',
         ]);
 
-        $tanggal = $request->tanggal;
-        $id_kelas = $request->id_kelas;
-        $id_mapel = $request->id_mapel;
+        // 2. Pecah string value menjadi ID terpisah
+        // Format value di view: "id_kelas-id_mapel"
+        $ids = explode('-', $request->kombinasi_jadwal);
 
+        // Pastikan hasil explode valid
+        if (count($ids) !== 2) {
+            return back()->with('error', 'Format jadwal tidak valid.');
+        }
+
+        $id_kelas = $ids[0];
+        $id_mapel = $ids[1];
+        $tanggal = $request->tanggal;
+
+        // 3. Logika pengecekan duplikasi
         $sudah_absen = KehadiranHarian::where('tanggal', $tanggal)
             ->where('id_kelas', $id_kelas)
             ->where('id_mapel', $id_mapel)
@@ -114,6 +124,7 @@ class AbsensiController extends Controller
             return redirect()->route('absensi.index')->with('warning', 'Absensi untuk tanggal ini sudah ada! Silakan edit di menu riwayat.');
         }
 
+        // 4. Ambil data untuk form absensi
         $siswa = Siswa::where('id_kelas', $id_kelas)
             ->orderBy('nama_siswa', 'asc')
             ->get();
@@ -138,7 +149,7 @@ class AbsensiController extends Controller
         if (!$user->guru) {
             return back()->with('error', 'Data guru tidak ditemukan untuk akun ini.');
         }
-        $id_guru = $user->guru->id_guru; 
+        $id_guru = $user->guru->id_guru;
 
         $tahun_ajar = \App\Models\TahunAjar::where('status', 'Aktif')->first();
         $id_tahun_ajar = $tahun_ajar ? $tahun_ajar->id_tahun_ajar : 1;
@@ -156,7 +167,7 @@ class AbsensiController extends Controller
                     ],
                     [
                         'id_kelas'      => $request->id_kelas,
-                        'id_guru'       => $id_guru, 
+                        'id_guru'       => $id_guru,
                         'id_tahun_ajar' => $id_tahun_ajar,
                         'status'        => $status_kode,
                         'keterangan'    => $request->keterangan[$id_siswa] ?? null,

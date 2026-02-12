@@ -17,7 +17,7 @@
                 <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-900">Parameter Absensi</h3>
-                        <p class="text-sm text-gray-500">Filter jadwal berdasarkan Mapel & Kelas.</p>
+                        <p class="text-sm text-gray-500">Pilih Jadwal (Kelas & Mapel) untuk melihat tanggal tersedia.</p>
                     </div>
                     <div id="status-indicator" class="hidden px-3 py-1 rounded bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wide">
                         Sedang Memuat...
@@ -48,26 +48,17 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="relative">
-                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Mata Pelajaran</label>
-                            <select name="id_mapel" id="id_mapel" required class="block w-full pl-4 pr-10 py-3 text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm bg-gray-50 transition-colors cursor-pointer filter-trigger">
-                                <option value="">-- Pilih Mapel --</option>
-                                @foreach($mapels as $m)
-                                <option value="{{ $m->id_mapel }}">{{ $m->nama_mapel }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="relative">
-                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Kelas Target</label>
-                            <select name="id_kelas" id="id_kelas" required class="block w-full pl-4 pr-10 py-3 text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm bg-gray-50 transition-colors cursor-pointer filter-trigger">
-                                <option value="">-- Pilih Kelas --</option>
-                                @foreach($kelas as $k)
-                                <option value="{{ $k->id_kelas }}">{{ $k->nama_kelas }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="mb-8 relative">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Jadwal (Kelas - Mata Pelajaran)</label>
+                        <select name="kombinasi_jadwal" id="kombinasi_jadwal" required class="block w-full pl-4 pr-10 py-3 text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm bg-gray-50 transition-colors cursor-pointer filter-trigger">
+                            <option value="">-- Pilih Kelas & Mata Pelajaran --</option>
+                            @foreach($jadwal_guru as $jadwal)
+                                {{-- Value format: ID_KELAS - ID_MAPEL --}}
+                                <option value="{{ $jadwal->id_kelas }}-{{ $jadwal->id_mapel }}">
+                                    {{ $jadwal->kelas->nama_kelas }} - {{ $jadwal->mapel->nama_mapel }} ({{ $jadwal->hari ?? 'Jadwal Umum' }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="border-t border-gray-100 pt-6">
@@ -75,7 +66,7 @@
                             
                             <div class="relative flex-grow">
                                 <select name="tanggal" id="tanggal" required disabled class="block w-full pl-4 pr-10 py-4 text-base border-transparent bg-transparent focus:ring-0 text-gray-500 cursor-not-allowed font-medium">
-                                    <option value="">-- Pilih Mapel & Kelas di atas dahulu --</option>
+                                    <option value="">-- Pilih Jadwal di atas dahulu --</option>
                                 </select>
                             </div>
 
@@ -97,8 +88,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const mapelSelect = document.getElementById('id_mapel');
-            const kelasSelect = document.getElementById('id_kelas');
+            const jadwalSelect = document.getElementById('kombinasi_jadwal'); // ID Baru
             const bulanSelect = document.getElementById('bulan');
             const tahunSelect = document.getElementById('tahun');
             const tanggalSelect = document.getElementById('tanggal');
@@ -108,25 +98,30 @@
             const helperText = document.getElementById('helper-text');
 
             async function fetchTanggal() {
-                const mapel = mapelSelect.value;
-                const kelas = kelasSelect.value;
+                const kombinasi = jadwalSelect.value;
                 const bulan = bulanSelect.value;
                 const tahun = tahunSelect.value;
 
                 resetUI();
 
-                if (!mapel || !kelas) return;
+                if (!kombinasi) return;
+
+                // Pecah value "id_kelas-id_mapel" menjadi variabel terpisah
+                const parts = kombinasi.split('-');
+                const idKelas = parts[0];
+                const idMapel = parts[1];
 
                 setLoading(true);
 
                 try {
-                    const response = await fetch(`{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`);
+                    // Panggil API dengan parameter yang sudah dipecah
+                    const response = await fetch(`{{ route('absensi.get-tanggal') }}?id_mapel=${idMapel}&id_kelas=${idKelas}&bulan=${bulan}&tahun=${tahun}`);
                     const data = await response.json();
 
                     tanggalSelect.innerHTML = ''; 
 
                     if (data.length === 0) {
-                        tanggalSelect.innerHTML = '<option value="">Tidak ada jadwal pertemuan ditemukan</option>';
+                        tanggalSelect.innerHTML = '<option value="">Tidak ada jadwal pertemuan ditemukan pada bulan ini</option>';
                         updateStatus('Jadwal Kosong', 'red');
                     } else {
                         let count = 0;
@@ -197,7 +192,7 @@
             }
 
             function resetUI() {
-                tanggalSelect.innerHTML = '<option value="">-- Pilih Mapel & Kelas di atas dahulu --</option>';
+                tanggalSelect.innerHTML = '<option value="">-- Pilih Jadwal di atas dahulu --</option>';
                 tanggalSelect.disabled = true;
                 tanggalSelect.classList.add('text-gray-500', 'cursor-not-allowed');
                 tanggalSelect.classList.remove('text-indigo-700', 'cursor-pointer', 'bg-white');
@@ -218,6 +213,7 @@
                 btnSubmit.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'shadow-md', 'text-white', 'hover:scale-[1.02]');
             }
 
+            // Pasang event listener ke elemen filter
             const filters = document.querySelectorAll('.filter-trigger');
             filters.forEach(el => el.addEventListener('change', fetchTanggal));
         });
