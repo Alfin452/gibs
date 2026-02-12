@@ -1,19 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                {{ __('Input Kehadiran Baru') }}
-            </h2>
-        </div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Rekap Kehadiran') }}
+        </h2>
     </x-slot>
 
     <div class="py-1 w-full px-2 sm:px-6 lg:px-1">
-        
+
         <form action="{{ route('absensi.cek') }}" method="POST">
             @csrf
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-xl border border-gray-200">
-                
+
                 <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-900">Parameter Absensi</h3>
@@ -25,7 +23,7 @@
                 </div>
 
                 <div class="p-6 lg:p-8">
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="relative">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Bulan</label>
@@ -53,17 +51,17 @@
                         <select name="kombinasi_jadwal" id="kombinasi_jadwal" required class="block w-full pl-4 pr-10 py-3 text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm bg-gray-50 transition-colors cursor-pointer filter-trigger">
                             <option value="">-- Pilih Kelas & Mata Pelajaran --</option>
                             @foreach($jadwal_guru as $jadwal)
-                                {{-- Value format: ID_KELAS - ID_MAPEL --}}
-                                <option value="{{ $jadwal->id_kelas }}-{{ $jadwal->id_mapel }}">
-                                    {{ $jadwal->kelas->nama_kelas }} - {{ $jadwal->mapel->nama_mapel }} ({{ $jadwal->hari ?? 'Jadwal Umum' }})
-                                </option>
+                            {{-- Value format: ID_KELAS - ID_MAPEL --}}
+                            <option value="{{ $jadwal->id_kelas }}-{{ $jadwal->id_mapel }}">
+                                {{ $jadwal->kelas->nama_kelas }} - {{ $jadwal->mapel->nama_mapel }} ({{ $jadwal->hari ?? 'Jadwal Umum' }})
+                            </option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="border-t border-gray-100 pt-6">
                         <div class="bg-indigo-50 rounded-lg p-1 border border-indigo-100 flex flex-col md:flex-row">
-                            
+
                             <div class="relative flex-grow">
                                 <select name="tanggal" id="tanggal" required disabled class="block w-full pl-4 pr-10 py-4 text-base border-transparent bg-transparent focus:ring-0 text-gray-500 cursor-not-allowed font-medium">
                                     <option value="">-- Pilih Jadwal di atas dahulu --</option>
@@ -73,7 +71,9 @@
                             <div class="md:w-auto w-full p-1">
                                 <button type="submit" id="btn-submit" disabled class="w-full h-full min-h-[50px] px-8 rounded-md bg-gray-300 text-white font-bold text-sm uppercase tracking-wider transition-all shadow-none cursor-not-allowed flex items-center justify-center gap-2">
                                     <span>Buka Absensi</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
                                 </button>
                             </div>
 
@@ -93,7 +93,7 @@
             const tahunSelect = document.getElementById('tahun');
             const tanggalSelect = document.getElementById('tanggal');
             const btnSubmit = document.getElementById('btn-submit');
-            
+
             const statusIndicator = document.getElementById('status-indicator');
             const helperText = document.getElementById('helper-text');
 
@@ -118,7 +118,7 @@
                     const response = await fetch(`{{ route('absensi.get-tanggal') }}?id_mapel=${idMapel}&id_kelas=${idKelas}&bulan=${bulan}&tahun=${tahun}`);
                     const data = await response.json();
 
-                    tanggalSelect.innerHTML = ''; 
+                    tanggalSelect.innerHTML = '';
 
                     if (data.length === 0) {
                         tanggalSelect.innerHTML = '<option value="">Tidak ada jadwal pertemuan ditemukan pada bulan ini</option>';
@@ -131,11 +131,11 @@
                             const option = document.createElement('option');
                             option.value = item.tanggal;
                             if (item.status === 'sudah') {
-                                option.text = `${item.tampilan} *SELESAI`; 
+                                option.text = `${item.tampilan} *SELESAI`;
                                 option.disabled = true;
                                 option.classList.add('bg-gray-100', 'text-gray-400');
                             } else {
-                                option.text = `${item.tampilan}`; 
+                                option.text = `${item.tampilan}`;
                                 option.classList.add('font-bold', 'text-gray-900');
                                 count++;
                             }
@@ -145,11 +145,11 @@
                         tanggalSelect.disabled = false;
                         tanggalSelect.classList.remove('text-gray-500', 'cursor-not-allowed');
                         tanggalSelect.classList.add('text-indigo-700', 'cursor-pointer', 'bg-white');
-                        
+
                         updateStatus(`${count} Jadwal Ditemukan`, 'green');
 
                         tanggalSelect.addEventListener('change', function() {
-                            if(this.value) {
+                            if (this.value) {
                                 enableSubmit();
                             } else {
                                 disableSubmit();
@@ -166,7 +166,7 @@
             }
 
             function setLoading(isLoading) {
-                if(isLoading) {
+                if (isLoading) {
                     statusIndicator.classList.remove('hidden');
                     statusIndicator.textContent = 'Mencari...';
                     statusIndicator.className = 'px-3 py-1 rounded bg-yellow-100 text-yellow-700 text-xs font-bold uppercase tracking-wide animate-pulse';
@@ -177,12 +177,12 @@
             function updateStatus(text, color) {
                 statusIndicator.classList.remove('hidden', 'animate-pulse');
                 statusIndicator.textContent = text;
-                const colorClasses = color === 'red' 
-                    ? 'bg-red-100 text-red-700' 
-                    : 'bg-green-100 text-green-700';
+                const colorClasses = color === 'red' ?
+                    'bg-red-100 text-red-700' :
+                    'bg-green-100 text-green-700';
                 statusIndicator.className = `px-3 py-1 rounded text-xs font-bold uppercase tracking-wide ${colorClasses}`;
-                
-                if(color === 'green') {
+
+                if (color === 'green') {
                     helperText.textContent = 'Silakan pilih tanggal untuk melanjutkan.';
                     helperText.classList.add('text-indigo-500');
                 } else {
