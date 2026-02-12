@@ -12,12 +12,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
 
-        /* Animasi halus untuk konten */
         .fade-in {
             animation: fadeIn 0.5s ease-out forwards;
             opacity: 0;
@@ -33,6 +34,11 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Custom Font SweetAlert */
+        .swal2-popup {
+            font-family: 'Inter', sans-serif !important;
         }
     </style>
 
@@ -89,14 +95,14 @@
     </div>
 
     <script>
+        // 1. Mobile Sidebar Logic
         function toggleSidebar() {
             const sidebar = document.querySelector('aside');
             const overlay = document.getElementById('mobile-overlay');
 
-            // Toggle class hidden pada sidebar (di mobile sidebar biasanya hidden by default)
             if (sidebar.classList.contains('hidden')) {
                 sidebar.classList.remove('hidden');
-                sidebar.classList.add('flex'); // Pastikan display flex agar layout column jalan
+                sidebar.classList.add('flex');
                 overlay.classList.remove('hidden');
             } else {
                 sidebar.classList.add('hidden');
@@ -104,6 +110,72 @@
                 overlay.classList.add('hidden');
             }
         }
+
+        // 2. SweetAlert2 Notifications (Flash Messages)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Success Message
+            @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                toast: true,
+                position: 'top-end',
+                background: '#ffffff',
+                iconColor: '#10B981'
+            });
+            @endif
+
+            // Error Message
+            @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
+            @endif
+
+            // Warning Message
+            @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: "{{ session('warning') }}",
+                confirmButtonColor: '#F59E0B',
+                confirmButtonText: 'Mengerti'
+            });
+            @endif
+        });
+
+        // 3. Global Logout Confirmation
+        // Script ini otomatis mencari semua form yang mengarah ke route 'logout'
+        document.addEventListener('submit', function(e) {
+            if (e.target && e.target.action && e.target.action.includes('logout')) {
+                e.preventDefault(); // Stop submit langsung
+
+                Swal.fire({
+                    title: 'Konfirmasi Keluar',
+                    text: "Apakah Anda yakin ingin mengakhiri sesi ini?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5', // Indigo 600
+                    cancelButtonColor: '#9CA3AF', // Gray 400
+                    confirmButtonText: 'Ya, Keluar',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    focusCancel: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.target.submit(); // Lanjutkan submit jika user klik Ya
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
