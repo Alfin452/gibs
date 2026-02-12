@@ -13,14 +13,10 @@ use Illuminate\Support\Facades\Auth; // Wajib ada
 
 class AbsensiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Menampilkan riwayat absensi (bisa difilter per guru jika perlu, 
-        // tapi defaultnya menampilkan semua riwayat inputan guru tsb)
-
         $user = Auth::user();
-        // Opsional: Filter riwayat hanya milik guru yang login
-        // Jika admin, mungkin bisa lihat semua. Di sini kita asumsi lihat punya sendiri.
+
         $id_guru = $user->guru ? $user->guru->id_guru : null;
 
         $query = KehadiranHarian::select(
@@ -39,14 +35,44 @@ class AbsensiController extends Controller
             ->groupBy('tanggal', 'id_kelas', 'id_mapel', 'id_guru')
             ->orderBy('tanggal', 'desc');
 
-        // Jika dia Guru, tampilkan riwayat dia saja
         if ($id_guru) {
             $query->where('id_guru', $id_guru);
         }
 
-        $riwayat = $query->get();
+        // --- FITUR FILTER & SEARCH ---
 
-        return view('absensi.index', compact('riwayat'));
+        // A. Filter Bulan
+        if ($request->filled('bulan')) {
+            $query->whereMonth('tanggal', $request->bulan);
+        }
+
+        // B. Filter Tahun
+        if ($request->filled('tahun')) {
+            $query->whereYear('tanggal', $request->tahun);
+        }
+
+        // C. Search (Nama Kelas atau Mapel)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('kelas', function ($k) use ($search) {
+                    $k->where('nama_kelas', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('mapel', function ($m) use ($search) {
+                        $m->where('nama_mapel', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Ambil Data (Pagination biar ringan kalau data banyak)
+        $riwayat = $query->paginate(10)->withQueryString();
+
+        // 4. Data Untuk Dropdown Popup (Ambil dari Jadwal Guru)
+        $jadwal_guru = Jadwal::where('id_guru', $id_guru)->with(['mapel', 'kelas'])->get();
+        $mapels_list = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
+        $kelas_list = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
+
+        return view('absensi.index', compact('riwayat', 'mapels_list', 'kelas_list'));
     }
 
     // --- BAGIAN CREATE SUDAH DINAMIS ---
