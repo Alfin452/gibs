@@ -67,30 +67,54 @@
                             </th>
                             @endforeach
 
-                            <th colspan="6" class="px-2 py-2 text-center font-bold text-gray-900 border-b bg-indigo-50/50">
+                            <th colspan="7" class="px-2 py-2 text-center font-bold text-gray-900 border-b-2 border-indigo-200 bg-indigo-50 border-l-4 border-l-indigo-200">
                                 Ringkasan Akumulasi
                             </th>
                         </tr>
                         <tr>
                             @foreach($tanggal_pertemuan as $tgl)
-                            <th class="border-r bg-gray-50"></th>
+                            <th class="border-r bg-gray-50 h-8"></th>
                             @endforeach
 
-                            <th class="px-3 py-1 text-center text-xs font-bold text-green-600 bg-indigo-50/50 border-r" title="Hadir">H</th>
-                            <th class="px-3 py-1 text-center text-xs font-bold text-blue-600 bg-indigo-50/50 border-r" title="Sakit">S</th>
-                            <th class="px-3 py-1 text-center text-xs font-bold text-yellow-600 bg-indigo-50/50 border-r" title="Izin">I</th>
-                            <th class="px-3 py-1 text-center text-xs font-bold text-red-600 bg-indigo-50/50 border-r" title="Alpha">A</th>
-                            <th class="px-3 py-1 text-center text-xs font-bold text-gray-700 bg-indigo-50/50 border-r" title="Total Input">T</th>
-                            <th class="px-3 py-1 text-center text-xs font-bold text-indigo-700 bg-indigo-50/50" title="Persentase">%</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-green-700 bg-indigo-50 border-r border-indigo-100 border-l-4 border-l-indigo-200" title="Hadir">H</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-blue-700 bg-indigo-50 border-r border-indigo-100" title="Sakit">S</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-yellow-700 bg-indigo-50 border-r border-indigo-100" title="Izin">I</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-red-700 bg-indigo-50 border-r border-indigo-100" title="Alpha">A</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-600 bg-indigo-50 border-r border-indigo-100" title="Libur">L</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-900 bg-indigo-100/50 border-r border-indigo-100" title="Total Data">Total</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-indigo-700 bg-indigo-100/50" title="Persentase Kehadiran">%</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($siswa as $index => $s)
                         @php
-                        $h = 0; $sa = 0; $i = 0; $a = 0;
-                        $total_pertemuan = count($tanggal_pertemuan);
-                        @endphp
-                        <tr class="hover:bg-gray-50 transition-colors group">
+                        $h = 0; $sa = 0; $i = 0; $a = 0; $l = 0;
+                        $total_pertemuan_jadwal = count($tanggal_pertemuan);
+
+                        // Hitung Statistik
+                        foreach($tanggal_pertemuan as $tgl) {
+                        $status = $rekap[$s->id_siswa][$tgl] ?? '-';
+                        if($status == 'H') $h++;
+                        elseif($status == 'S') $sa++;
+                        elseif($status == 'I') $i++;
+                        elseif($status == 'A') $a++;
+                        elseif($status == 'L') $l++;
+                        }
+
+                        // Total Data Masuk (H+S+I+A+L)
+                        $total_input = $h + $sa + $i + $a + $l;
+
+                        // Rumus Persentase: (Hadir / (Total Jadwal - Libur)) * 100
+                        // Libur tidak dianggap sebagai hari efektif belajar
+                        $hari_efektif = $total_pertemuan_jadwal - $l;
+                        $pembagi = $hari_efektif > 0 ? $hari_efektif : 1;
+                        $persen = round(($h / $pembagi) * 100);
+
+                        // Warna Persentase
+                        $colorPersen = $persen < 75 ? 'text-red-600 font-extrabold' : ($persen < 90 ? 'text-yellow-600 font-bold' : 'text-green-600 font-bold' );
+                            @endphp
+
+                            <tr class="hover:bg-gray-50 transition-colors group">
                             <td class="px-2 py-3 text-center text-gray-500 border-r sticky left-0 z-20 bg-white group-hover:bg-gray-50">
                                 {{ $index + 1 }}
                             </td>
@@ -101,16 +125,12 @@
                             @foreach($tanggal_pertemuan as $tgl)
                             @php
                             $status = $rekap[$s->id_siswa][$tgl] ?? '-';
-                            if($status == 'H') $h++;
-                            elseif($status == 'S') $sa++;
-                            elseif($status == 'I') $i++;
-                            elseif($status == 'A') $a++;
-
                             $bgClass = match($status) {
                             'H' => 'bg-green-50 text-green-700 font-bold',
                             'S' => 'bg-blue-50 text-blue-700 font-bold',
                             'I' => 'bg-yellow-50 text-yellow-700 font-bold',
                             'A' => 'bg-red-50 text-red-700 font-bold',
+                            'L' => 'bg-gray-200 text-gray-500 font-bold', // Warna Libur
                             '-' => 'text-gray-300',
                             default => ''
                             };
@@ -120,42 +140,37 @@
                             </td>
                             @endforeach
 
-                            <td class="px-2 py-2 text-center font-bold text-green-600 bg-indigo-50/20 border-r">{{ $h }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-blue-600 bg-indigo-50/20 border-r">{{ $sa }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-yellow-600 bg-indigo-50/20 border-r">{{ $i }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-red-600 bg-indigo-50/20 border-r">{{ $a }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-green-600 bg-indigo-50/30 border-r border-indigo-100 border-l-4 border-l-indigo-200">{{ $h }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-blue-600 bg-indigo-50/30 border-r border-indigo-100">{{ $sa }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-yellow-600 bg-indigo-50/30 border-r border-indigo-100">{{ $i }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-red-600 bg-indigo-50/30 border-r border-indigo-100">{{ $a }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-gray-500 bg-indigo-50/30 border-r border-indigo-100">{{ $l }}</td>
 
-                            @php
-                            $total_data = $h + $sa + $i + $a;
-                            $pembagi = $total_pertemuan > 0 ? $total_pertemuan : 1;
-                            $persen = round(($h / $pembagi) * 100);
-                            $colorPersen = $persen < 75 ? 'text-red-600' : 'text-indigo-600' ;
-                                @endphp
-
-                                <td class="px-2 py-2 text-center font-bold text-gray-700 bg-indigo-50/20 border-r">{{ $total_data }}</td>
-                                <td class="px-2 py-2 text-center font-bold bg-indigo-50/20 {{ $colorPersen }}">{{ $persen }}%</td>
-                        </tr>
-                        @endforeach
+                            <td class="px-2 py-2 text-center font-bold text-gray-800 bg-indigo-100/30 border-r border-indigo-100">{{ $total_input }}</td>
+                            <td class="px-2 py-2 text-center bg-indigo-100/30 {{ $colorPersen }}">{{ $persen }}%</td>
+                            </tr>
+                            @endforeach
                     </tbody>
                 </table>
             </div>
 
             <div class="bg-gray-50 px-6 py-4 text-xs text-gray-500 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-4">
                 <div>
-                    <p class="font-bold mb-1">Keterangan:</p>
-                    <div class="flex flex-wrap gap-3">
+                    <p class="font-bold mb-1 text-gray-700">Keterangan Kode:</p>
+                    <div class="flex flex-wrap gap-4">
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> H = Hadir</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> S = Sakit</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> I = Izin</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> A = Alpha</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-500"></span> L = Libur</span>
                     </div>
                 </div>
                 <div class="text-right">
-                    <p>Total Pertemuan (Jadwal): <strong>{{ count($tanggal_pertemuan) }} Hari</strong></p>
-                    <p class="text-[10px] mt-1 text-gray-400">
-                        * T = Total Input Data (H+S+I+A).<br>
-                        * % = (Hadir / Total Pertemuan) x 100.
-                    </p>
+                    <p class="mb-1">Total Pertemuan Efektif: <strong>{{ count($tanggal_pertemuan) }} Hari</strong> (Termasuk Libur)</p>
+                    <div class="text-[10px] text-gray-400 space-y-0.5">
+                        <p>* Total = Penjumlahan semua data (H+S+I+A+L).</p>
+                        <p>* Persentase (%) = (Hadir / (Total Jadwal - Libur)) x 100.</p>
+                    </div>
                 </div>
             </div>
         </div>
