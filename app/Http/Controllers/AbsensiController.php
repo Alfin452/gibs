@@ -385,15 +385,32 @@ class AbsensiController extends Controller
 
     public function daftarKelas(Request $request)
     {
+        $user = Auth::user();
 
-        $query = Kelas::withCount('siswa'); // Menghitung jumlah siswa per kelas
+        // 1. Validasi apakah user adalah guru
+        if (!$user->guru) {
+            return redirect()->route('dashboard')->with('error', 'Anda tidak terdaftar sebagai Guru.');
+        }
 
-        // Fitur Pencarian
-        if ($request->has('search')) {
+        $id_guru = $user->guru->id_guru;
+
+        // 2. Ambil semua ID Kelas yang ada di jadwal guru ini
+        // pluck('id_kelas') mengambil array [1, 2, 5, ...]
+        $id_kelas_diampu = Jadwal::where('id_guru', $id_guru)
+            ->pluck('id_kelas')
+            ->unique() // Hindari duplikat ID jika guru mengajar mapel beda di kelas sama
+            ->toArray();
+
+        // 3. Query Kelas dengan Filter
+        $query = Kelas::withCount('siswa')
+            ->whereIn('id_kelas', $id_kelas_diampu); // <--- Filter Utama
+
+        // 4. Fitur Pencarian (Search hanya mencari di dalam kelas yang diampu)
+        if ($request->filled('search')) {
             $query->where('nama_kelas', 'like', '%' . $request->search . '%');
         }
 
-        $kelas = $query->orderBy('nama_kelas', 'asc')->paginate(12);
+        $kelas = $query->orderBy('nama_kelas', 'asc')->paginate(12)->withQueryString();
 
         // Arahkan ke folder: resources/views/absensi/kelas/index.blade.php
         return view('absensi.kelas.index', compact('kelas'));

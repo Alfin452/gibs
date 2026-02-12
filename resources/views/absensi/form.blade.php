@@ -1,29 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
                 {{ __('Lembar Absensi Siswa') }}
             </h2>
-            <div class="text-sm text-right">
-                <p class="font-bold text-indigo-600">{{ $infoKelas->nama_kelas }}</p>
-                <p class="text-gray-500">{{ \Carbon\Carbon::parse($tanggal)->isoFormat('dddd, D MMMM Y') }}</p>
+            <div class="flex items-center gap-3 text-sm text-right">
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Kelas</p>
+                    <p class="font-bold text-indigo-600">{{ $infoKelas->nama_kelas }}</p>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tanggal</p>
+                    <p class="font-bold text-gray-700">{{ \Carbon\Carbon::parse($tanggal)->isoFormat('dddd, D MMMM Y') }}</p>
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="max-w-5xl mx-auto">
+    <div class="py-1 w-full px-4 sm:px-6 lg:px-1">
 
-        <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6 rounded-r-lg flex justify-between items-center">
-            <div>
-                <p class="text-sm text-indigo-700 font-bold uppercase tracking-wider">Mata Pelajaran</p>
-                <h3 class="text-xl font-bold text-gray-900">{{ $infoMapel->nama_mapel }}</h3>
+        <div class="bg-indigo-600 rounded-t-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
+            <div class="text-white">
+                <p class="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">Mata Pelajaran</p>
+                <h3 class="text-2xl font-bold">{{ $infoMapel->nama_mapel }}</h3>
             </div>
 
-            <div class="flex gap-2">
-                <button type="button" onclick="setSemua('H')" class="bg-white text-green-600 border border-green-200 px-3 py-1 rounded text-xs font-bold hover:bg-green-50">
-                    Set Semua Hadir
+            <div class="flex gap-2 bg-indigo-700/50 p-1.5 rounded-lg backdrop-blur-sm">
+                <button type="button" onclick="setSemua('H')" class="bg-white text-green-700 px-4 py-2 rounded-md text-xs font-bold hover:bg-green-50 shadow-sm transition-all flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Set Semua Hadir
                 </button>
-                <button type="button" onclick="setSemua('L')" class="bg-white text-gray-500 border border-gray-200 px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">
+                <button type="button" onclick="setSemua('L')" class="text-white px-4 py-2 rounded-md text-xs font-bold hover:bg-indigo-600 transition-all border border-transparent hover:border-indigo-400">
                     Set Hari Libur
                 </button>
             </div>
@@ -35,77 +41,77 @@
             <input type="hidden" name="id_kelas" value="{{ $infoKelas->id_kelas }}">
             <input type="hidden" name="id_mapel" value="{{ $infoMapel->id_mapel }}">
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-xl border border-gray-100">
-                <div class="p-6">
+            <div class="bg-white overflow-hidden shadow-xl rounded-b-xl border border-t-0 border-gray-200">
+                
+                <div class="overflow-auto max-h-[65vh] relative">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
-                                <th class="px-4 py-3 w-10">No</th>
-                                <th class="px-4 py-3">Nama Siswa</th>
-                                <th class="px-4 py-3 text-center w-64">Status Kehadiran</th>
-                                <th class="px-4 py-3">Keterangan (Opsional)</th>
+                        <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-16 border-b-2 border-gray-200 bg-gray-50">
+                                    No
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50">
+                                    Nama Siswa
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-80 border-b-2 border-gray-200 bg-gray-50">
+                                    Status Kehadiran
+                                </th>
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50">
+                                    Keterangan (Opsional)
+                                </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="bg-white divide-y divide-gray-100">
                             @foreach($siswa as $index => $s)
 
-                            {{-- LOGIKA PENENTUAN STATUS --}}
                             @php
-                            // Cek apakah ada data lama ($dataKehadiran dikirim dari controller edit)
-                            // Kalau tidak ada (input baru), default null atau 'H' sesuai selera
                             $statusDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->status ?? 'H') : 'H';
                             $ketDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->keterangan ?? '') : '';
                             @endphp
 
-                            <tr class="hover:bg-gray-50 transition-colors group">
-                                <td class="px-4 py-3 text-gray-500">{{ $index + 1 }}</td>
-                                <td class="px-4 py-3">
-                                    <p class="font-medium text-gray-900">{{ $s->nama_siswa }}</p>
-                                    <p class="text-xs text-gray-400">{{ $s->nis }}</p>
+                            <tr class="hover:bg-indigo-50/30 transition-colors group">
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-medium align-middle">
+                                    {{ $index + 1 }}
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex justify-center gap-1 bg-gray-100 p-1 rounded-lg">
+                                
+                                <td class="px-6 py-4 align-middle">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                            {{ $s->nama_siswa }}
+                                        </span>
+                                        <span class="text-xs text-gray-400 font-mono mt-0.5">
+                                            NIS: {{ $s->nis }}
+                                        </span>
+                                    </div>
+                                </td>
 
-                                        {{-- HADIR --}}
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="H" class="peer sr-only radio-status"
-                                                {{ $statusDB == 'H' ? 'checked' : '' }}>
-                                            <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-green-500 peer-checked:text-white transition-all">H</div>
-                                        </label>
+                                <td class="px-6 py-4 align-middle">
+                                    <div class="flex justify-center items-center gap-1 bg-gray-100 p-1.5 rounded-lg border border-gray-200 shadow-inner">
 
-                                        {{-- SAKIT --}}
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="S" class="peer sr-only radio-status"
-                                                {{ $statusDB == 'S' ? 'checked' : '' }}>
-                                            <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all">S</div>
-                                        </label>
+                                        @foreach(['H' => ['green', 'Hadir'], 'S' => ['blue', 'Sakit'], 'I' => ['yellow', 'Izin'], 'A' => ['red', 'Alpha'], 'L' => ['gray', 'Libur']] as $code => $style)
+                                        <label class="cursor-pointer relative group/radio">
+                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="{{ $code }}" 
+                                                class="peer sr-only" {{ $statusDB == $code ? 'checked' : '' }}>
+                                            
+                                            <div class="w-10 h-8 flex items-center justify-center rounded text-xs font-bold text-gray-500 
+                                                hover:bg-white hover:text-gray-700
+                                                peer-checked:bg-{{ $style[0] }}-500 peer-checked:text-white peer-checked:shadow-md 
+                                                transition-all duration-200">
+                                                {{ $code }}
+                                            </div>
 
-                                        {{-- IZIN --}}
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="I" class="peer sr-only radio-status"
-                                                {{ $statusDB == 'I' ? 'checked' : '' }}>
-                                            <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-yellow-500 peer-checked:text-white transition-all">I</div>
+                                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/radio:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                                {{ $style[1] }}
+                                            </div>
                                         </label>
-
-                                        {{-- ALPHA --}}
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="A" class="peer sr-only radio-status"
-                                                {{ $statusDB == 'A' ? 'checked' : '' }}>
-                                            <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-red-500 peer-checked:text-white transition-all">A</div>
-                                        </label>
-
-                                        {{-- LIBUR --}}
-                                        <label class="cursor-pointer">
-                                            <input type="radio" name="status[{{ $s->id_siswa }}]" value="L" class="peer sr-only radio-status"
-                                                {{ $statusDB == 'L' ? 'checked' : '' }}>
-                                            <div class="px-3 py-1 rounded text-xs font-bold text-gray-500 peer-checked:bg-gray-500 peer-checked:text-white transition-all">L</div>
-                                        </label>
+                                        @endforeach
 
                                     </div>
                                 </td>
-                                <td class="px-4 py-3">
-                                    <input type="text" name="keterangan[{{ $s->id_siswa }}]" value="{{ $ketDB }}" placeholder="Catatan..."
-                                        class="w-full text-sm border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500">
+
+                                <td class="px-6 py-4 align-middle">
+                                    <input type="text" name="keterangan[{{ $s->id_siswa }}]" value="{{ $ketDB }}" placeholder="Tulis catatan..."
+                                        class="w-full text-sm border-gray-200 bg-gray-50 focus:bg-white rounded-md focus:border-indigo-500 focus:ring-indigo-500 transition-all placeholder-gray-400">
                                 </td>
                             </tr>
                             @endforeach
@@ -113,9 +119,13 @@
                     </table>
                 </div>
 
-                <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-transform transform hover:scale-105">
-                        Simpan Data Absensi
+                <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                    <p class="text-sm text-gray-500 italic">
+                        Pastikan semua data siswa telah dicek sebelum menyimpan.
+                    </p>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-[1.02] flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        Simpan Absensi
                     </button>
                 </div>
             </div>
@@ -124,7 +134,6 @@
 
     <script>
         function setSemua(status) {
-            // Cari semua radio button dengan value sesuai status (H/L/dll)
             const radios = document.querySelectorAll(`input[value="${status}"]`);
             radios.forEach(radio => {
                 radio.checked = true;
