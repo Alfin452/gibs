@@ -39,19 +39,15 @@ class AbsensiController extends Controller
             $query->where('id_guru', $id_guru);
         }
 
-        // --- FITUR FILTER & SEARCH ---
 
-        // A. Filter Bulan
         if ($request->filled('bulan')) {
             $query->whereMonth('tanggal', $request->bulan);
         }
 
-        // B. Filter Tahun
         if ($request->filled('tahun')) {
             $query->whereYear('tanggal', $request->tahun);
         }
 
-        // C. Search (Nama Kelas atau Mapel)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -64,10 +60,8 @@ class AbsensiController extends Controller
             });
         }
 
-        // Ambil Data (Pagination biar ringan kalau data banyak)
         $riwayat = $query->paginate(10)->withQueryString();
 
-        // 4. Data Untuk Dropdown Popup (Ambil dari Jadwal Guru)
         $jadwal_guru = Jadwal::where('id_guru', $id_guru)->with(['mapel', 'kelas'])->get();
         $mapels_list = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
         $kelas_list = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
@@ -75,20 +69,16 @@ class AbsensiController extends Controller
         return view('absensi.index', compact('riwayat', 'mapels_list', 'kelas_list'));
     }
 
-    // --- BAGIAN CREATE SUDAH DINAMIS ---
     public function create()
     {
         $user = Auth::user();
 
-        // 1. Cek apakah User terhubung ke data Guru
         if (!$user->guru) {
             return redirect()->route('dashboard')->with('error', 'Akun Anda tidak terdaftar sebagai Guru atau data Guru belum direlasikan!');
         }
 
-        // 2. AMBIL ID GURU DARI SESI LOGIN (Bukan lagi 15)
         $id_guru_aktif = $user->guru->id_guru;
 
-        // 3. Ambil Jadwal milik guru tersebut
         $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
             ->with(['mapel', 'kelas'])
             ->get();
@@ -97,7 +87,6 @@ class AbsensiController extends Controller
             return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar di sistem.');
         }
 
-        // 4. Filter Mapel & Kelas unik
         $mapels = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
         $kelas = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
 
@@ -116,7 +105,6 @@ class AbsensiController extends Controller
         $id_kelas = $request->id_kelas;
         $id_mapel = $request->id_mapel;
 
-        // Cek apakah sudah pernah absen
         $sudah_absen = KehadiranHarian::where('tanggal', $tanggal)
             ->where('id_kelas', $id_kelas)
             ->where('id_mapel', $id_mapel)
@@ -136,7 +124,6 @@ class AbsensiController extends Controller
         return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel'));
     }
 
-    // --- BAGIAN STORE SUDAH DINAMIS ---
     public function store(Request $request)
     {
         // 1. Validasi Input
@@ -147,14 +134,12 @@ class AbsensiController extends Controller
             'status'   => 'required|array',
         ]);
 
-        // 2. AMBIL ID GURU DARI SESI LOGIN (DINAMIS)
         $user = Auth::user();
         if (!$user->guru) {
             return back()->with('error', 'Data guru tidak ditemukan untuk akun ini.');
         }
-        $id_guru = $user->guru->id_guru; // <-- ID Otomatis dari Login
+        $id_guru = $user->guru->id_guru; 
 
-        // 3. Setup Tahun Ajar
         $tahun_ajar = \App\Models\TahunAjar::where('status', 'Aktif')->first();
         $id_tahun_ajar = $tahun_ajar ? $tahun_ajar->id_tahun_ajar : 1;
 
@@ -163,7 +148,6 @@ class AbsensiController extends Controller
         try {
             foreach ($request->status as $id_siswa => $status_kode) {
 
-                // A. Simpan/Update Harian
                 KehadiranHarian::updateOrCreate(
                     [
                         'tanggal'  => $request->tanggal,
@@ -172,14 +156,13 @@ class AbsensiController extends Controller
                     ],
                     [
                         'id_kelas'      => $request->id_kelas,
-                        'id_guru'       => $id_guru, // <-- Menggunakan ID Guru Login
+                        'id_guru'       => $id_guru, 
                         'id_tahun_ajar' => $id_tahun_ajar,
                         'status'        => $status_kode,
                         'keterangan'    => $request->keterangan[$id_siswa] ?? null,
                     ]
                 );
 
-                // B. Sinkronisasi ke Tabel Bulanan (Erapor Lama)
                 $this->updateRekapBulanan($id_siswa, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
             }
 
@@ -214,7 +197,6 @@ class AbsensiController extends Controller
     {
         $periode = date('m-Y', strtotime($tanggal));
 
-        // Hitung ulang statistik bulan ini
         $stats = KehadiranHarian::where('id_siswa', $id_siswa)
             ->where('id_mapel', $id_mapel)
             ->whereRaw("DATE_FORMAT(tanggal, '%m-%Y') = ?", [$periode])
@@ -226,7 +208,6 @@ class AbsensiController extends Controller
             ")
             ->first();
 
-        // Update tabel kehadiran_bulanan
         DB::table('kehadiran_bulanan')->updateOrInsert(
             [
                 'id_siswa' => $id_siswa,
@@ -266,7 +247,6 @@ class AbsensiController extends Controller
 
     public function prosesLaporan(Request $request)
     {
-        // ... (LOGIKA INI SUDAH BAGUS DAN ROBUST DARI SEBELUMNYA) ...
         $request->validate([
             'bulan' => 'required',
             'tahun' => 'required',
@@ -283,7 +263,6 @@ class AbsensiController extends Controller
         $infoKelas = Kelas::find($id_kelas);
         $infoMapel = Mapel::find($id_mapel);
 
-        // Cari jadwal berdasarkan Kelas & Mapel (Abaikan Guru, biar rekap tetap muncul meski beda guru)
         $hari_mengajar = Jadwal::where('id_kelas', $id_kelas)
             ->where('id_mapel', $id_mapel)
             ->pluck('hari')
@@ -346,19 +325,15 @@ class AbsensiController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
 
-        // 1. Cari Hari Mengajar Guru Tersebut di Kelas & Mapel ini
-        // Kita cari jadwal berdasarkan ID Kelas & Mapel (Logika umum jadwal)
         $jadwal_hari = Jadwal::where('id_kelas', $id_kelas)
             ->where('id_mapel', $id_mapel)
             ->pluck('hari')
             ->toArray();
 
-        // Jika tidak ada jadwal, kembalikan kosong
         if (empty($jadwal_hari)) {
             return response()->json([]);
         }
 
-        // 2. Generate Tanggal di Bulan Tersebut yang Sesuai Hari Mengajar
         $list_tanggal = [];
         $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
 
@@ -378,10 +353,8 @@ class AbsensiController extends Controller
             ];
             $hari_indo = $map_hari[$nama_hari_inggris] ?? '';
 
-            // Jika hari ini sesuai jadwal
             if (in_array($hari_indo, $jadwal_hari)) {
 
-                // Cek apakah SUDAH PERNAH DIABSEN?
                 $sudah_absen = KehadiranHarian::where('tanggal', $date)
                     ->where('id_kelas', $id_kelas)
                     ->where('id_mapel', $id_mapel)
@@ -397,5 +370,21 @@ class AbsensiController extends Controller
         }
 
         return response()->json($list_tanggal);
+    }
+
+    public function daftarKelas(Request $request)
+    {
+
+        $query = Kelas::withCount('siswa'); // Menghitung jumlah siswa per kelas
+
+        // Fitur Pencarian
+        if ($request->has('search')) {
+            $query->where('nama_kelas', 'like', '%' . $request->search . '%');
+        }
+
+        $kelas = $query->orderBy('nama_kelas', 'asc')->paginate(12);
+
+        // Arahkan ke folder: resources/views/absensi/kelas/index.blade.php
+        return view('absensi.kelas.index', compact('kelas'));
     }
 }
