@@ -74,23 +74,28 @@ class AbsensiController extends Controller
         $user = Auth::user();
 
         if (!$user->guru) {
-            return redirect()->route('dashboard')->with('error', 'Akun Anda tidak terdaftar sebagai Guru atau data Guru belum direlasikan!');
+            return redirect()->route('dashboard')->with('error', 'Akun Anda tidak terdaftar sebagai Guru!');
         }
 
         $id_guru_aktif = $user->guru->id_guru;
 
-        // Ambil jadwal lengkap dengan relasi mapel dan kelas
+        // Ambil jadwal guru
         $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
             ->with(['mapel', 'kelas'])
             ->get();
 
         if ($jadwal_guru->isEmpty()) {
-            return redirect()->route('absensi.index')->with('warning', '...');
+            return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar.');
         }
 
-        // Hapus bagian pluck mapels dan kelas yang terpisah.
-        // Kirim langsung $jadwal_guru ke view
-        return view('absensi.create', compact('jadwal_guru'));
+        // Ambil list unik Mapel dan Kelas dari jadwal
+        $mapels = $jadwal_guru->pluck('mapel')->unique('id_mapel')->values();
+        $kelas = $jadwal_guru->pluck('kelas')->unique('id_kelas')->values();
+
+        // Debugging (Opsional, hapus nanti):
+        // dd($mapels, $kelas); 
+
+        return view('absensi.create', compact('mapels', 'kelas'));
     }
 
     public function cekLembar(Request $request)

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\DashboardController; // Tambahkan ini
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -9,18 +10,14 @@ Route::get('/', function () {
     if (!Auth::check()) {
         return redirect()->route('login');
     }
-
-    $user = Auth::user();
-    if ($user->role === 'guru') {
-        return redirect()->route('absensi.index');
-    }
-
+    // Langsung arahkan ke Dashboard untuk melihat statistik & pengingat
     return redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// PENTING: Gunakan DashboardController, bukan function() biasa
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 
@@ -28,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Group Absensi
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiController::class, 'index'])->name('index');
         Route::get('/buat-baru', [AbsensiController::class, 'create'])->name('create');
