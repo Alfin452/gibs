@@ -11,7 +11,7 @@
 
                 <div class="mb-6 text-center">
                     <h3 class="text-lg font-bold text-gray-900">Mulai Absensi</h3>
-                    <p class="text-sm text-gray-500">Pilih kelas dan mata pelajaran untuk membuka lembar absensi.</p>
+                    <p class="text-sm text-gray-500">Silakan pilih tanggal, mata pelajaran, dan kelas.</p>
                 </div>
 
                 <form action="{{ route('absensi.cek') }}" method="POST">
@@ -20,7 +20,7 @@
                     <div class="mb-5">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pertemuan</label>
                         <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required
-                            class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition-colors">
+                            class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition-colors text-lg py-3 text-center font-bold text-gray-700">
                     </div>
 
                     <div class="mb-5">
