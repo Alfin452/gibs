@@ -17,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="py-1 w-full px-4 sm:px-6 lg:px-1">
+    <div class="py-6 w-full px-4 sm:px-6 lg:px-8">
 
         <div class="bg-indigo-600 rounded-t-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
             <div class="text-white">
@@ -41,22 +41,22 @@
             <input type="hidden" name="id_kelas" value="{{ $infoKelas->id_kelas }}">
             <input type="hidden" name="id_mapel" value="{{ $infoMapel->id_mapel }}">
 
-            <div class="bg-white overflow-hidden shadow-xl rounded-b-xl border border-t-0 border-gray-200">
+            <div class="bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-200">
                 
-                <div class="overflow-auto max-h-[65vh] relative">
+                <div class="w-full overflow-hidden rounded-b-xl">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                        <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-16 border-b-2 border-gray-200 bg-gray-50">
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-16 bg-gray-50">
                                     No
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50">
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50">
                                     Nama Siswa
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-80 border-b-2 border-gray-200 bg-gray-50">
+                                <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-80 bg-gray-50">
                                     Status Kehadiran
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50">
+                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50">
                                     Keterangan (Opsional)
                                 </th>
                             </tr>
@@ -119,11 +119,11 @@
                     </table>
                 </div>
 
-                <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-                    <p class="text-sm text-gray-500 italic">
+                <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center rounded-b-xl">
+                    <p class="text-sm text-gray-500 italic hidden sm:block">
                         Pastikan semua data siswa telah dicek sebelum menyimpan.
                     </p>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-[1.02] flex items-center gap-2">
+                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
                         Simpan Absensi
                     </button>
