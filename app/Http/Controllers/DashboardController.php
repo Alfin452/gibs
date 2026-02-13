@@ -79,14 +79,17 @@ class DashboardController extends Controller
                     $sudah_absen++;
                 } else {
                     $tunggakan_absen[] = [
-                        // Format Tanggal: "12 Februari 2026"
                         'tanggal' => $date->translatedFormat('d F Y'),
-                        // Nama Hari: "Senin"
                         'hari' => $nama_hari_indo,
                         'kelas' => $jadwal->kelas->nama_kelas ?? '-',
                         'mapel' => $jadwal->mapel->nama_mapel ?? '-',
                         'jam' => Carbon::parse($jadwal->jam_mulai)->format('H:i'),
-                        'link' => route('absensi.create')
+
+                        'link' => route('absensi.edit', [
+                            'id_kelas' => $jadwal->id_kelas,
+                            'id_mapel' => $jadwal->id_mapel,
+                            'tanggal' => $tanggal_sql // Format: Y-m-d
+                        ])
                     ];
                 }
             }
