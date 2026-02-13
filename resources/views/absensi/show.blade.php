@@ -14,7 +14,7 @@
                     <li aria-current="page">
                         <div class="flex items-center">
                             <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
                             </svg>
                             <span class="ml-1 text-sm font-medium text-gray-800 md:ml-2">{{ $kelas->nama_kelas }}</span>
                         </div>
@@ -28,9 +28,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 relative">
-                
+
                 <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50/30 rounded-t-3xl">
-                    
+
                     <div class="flex items-center gap-4 w-full md:w-auto">
                         <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0">
                             <span class="text-xl font-bold">{{ substr($kelas->nama_kelas, 0, 2) }}</span>
@@ -42,32 +42,26 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                        
+
                         <form id="search-form" action="{{ route('absensi.show', ['id_kelas' => $kelas->id_kelas, 'id_mapel' => $mapel->id_mapel]) }}" method="GET" class="relative w-full sm:w-64">
-                            <input type="text" 
+                            <input type="text"
                                 id="search-input"
-                                name="search" 
-                                value="{{ request('search') }}" 
+                                name="search"
+                                value="{{ request('search') }}"
                                 class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-gray-400 shadow-sm"
                                 placeholder="Cari siswa..."
                                 autocomplete="off"
-                                @if(request('search')) autofocus onfocus="var val=this.value; this.value=''; this.value= val;" @endif
-                            >
+                                @if(request('search')) autofocus onfocus="var val=this.value; this.value=''; this.value= val;" @endif>
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg id="search-loading" class="hidden animate-spin w-5 h-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <svg id="search-icon" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <svg id="search-icon" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
                             </div>
                         </form>
-
-                        <a href="{{ route('absensi.detail', ['id_kelas' => $kelas->id_kelas, 'id_mapel' => $mapel->id_mapel]) }}" 
-                           class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto whitespace-nowrap">
-                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                           <span>Matriks Bulanan</span>
-                        </a>
-
                     </div>
                 </div>
 
@@ -81,7 +75,7 @@
                                 <th class="px-6 py-4 font-bold text-center">Sakit</th>
                                 <th class="px-6 py-4 font-bold text-center">Izin</th>
                                 <th class="px-6 py-4 font-bold text-center">Alpha</th>
-                                <th class="px-6 py-4 font-bold text-center">Ket.</th> 
+                                <th class="px-6 py-4 font-bold text-center">Ket.</th>
                                 <th class="px-6 py-4 font-bold w-48 text-center">Kehadiran (%)</th>
                             </tr>
                         </thead>
@@ -102,7 +96,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                
+
                                 <td class="px-6 py-4 text-center">
                                     <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-100 min-w-[32px]">{{ $s->total_hadir }}</span>
                                 </td>
@@ -124,12 +118,14 @@
 
                                 <td class="px-6 py-4 text-center">
                                     @if(count($s->list_keterangan) > 0)
-                                        <button onclick="openNoteModal('{{ $s->nama_siswa }}', {{ json_encode($s->list_keterangan) }})"
-                                                class="inline-flex items-center justify-center w-8 h-8 text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all duration-200" title="Lihat Catatan">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                        </button>
+                                    <button onclick="openNoteModal('{{ $s->nama_siswa }}', {{ json_encode($s->list_keterangan) }})"
+                                        class="inline-flex items-center justify-center w-8 h-8 text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all duration-200" title="Lihat Catatan">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
                                     @else
-                                        <span class="text-gray-300">-</span>
+                                    <span class="text-gray-300">-</span>
                                     @endif
                                 </td>
 
@@ -141,8 +137,8 @@
                                             </span>
                                         </div>
                                         <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div class="h-full rounded-full {{ $s->persentase >= 90 ? 'bg-emerald-500' : ($s->persentase >= 75 ? 'bg-indigo-500' : 'bg-rose-500') }}" 
-                                                 style="width: {{ $s->persentase }}%"></div>
+                                            <div class="h-full rounded-full {{ $s->persentase >= 90 ? 'bg-emerald-500' : ($s->persentase >= 75 ? 'bg-indigo-500' : 'bg-rose-500') }}"
+                                                style="width: {{ $s->persentase }}%"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -162,27 +158,29 @@
     </div>
 
     <div id="noteModal" class="relative z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        
+
         <div id="noteModalBackdrop" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity opacity-0 z-[9998]"></div>
 
         <div class="fixed inset-0 z-[9999] w-screen overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                
+
                 <div id="noteModalPanel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300 ease-out border border-gray-100">
-                    
+
                     <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 flex justify-between items-center shadow-md">
                         <div class="text-white">
                             <h3 class="text-lg font-bold tracking-tight">Catatan Siswa</h3>
                             <p class="text-indigo-100 text-xs mt-0.5 font-medium opacity-90" id="modal-student-name">Nama Siswa</p>
                         </div>
                         <button type="button" onclick="closeNoteModal()" class="text-indigo-100 hover:text-white hover:bg-white/10 rounded-lg p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </button>
                     </div>
 
                     <div class="px-6 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar bg-gray-50/50">
                         <div id="modal-content" class="space-y-3">
-                            </div>
+                        </div>
                     </div>
 
                     <div class="bg-white px-6 py-3 border-t border-gray-100 flex justify-end">
@@ -204,7 +202,7 @@
             const searchLoading = document.getElementById('search-loading');
             let debounceTimer;
 
-            if(searchInput) {
+            if (searchInput) {
                 searchInput.addEventListener('input', function() {
                     searchIcon.classList.add('hidden');
                     searchLoading.classList.remove('hidden');
@@ -222,26 +220,31 @@
             const backdrop = document.getElementById('noteModalBackdrop');
             const panel = document.getElementById('noteModalPanel');
             const contentDiv = document.getElementById('modal-content');
-            
+
             // 1. Lock Scroll pada Body
             document.body.classList.add('overflow-hidden');
 
             // 2. Set Data
             document.getElementById('modal-student-name').innerText = namaSiswa;
-            
+
             // 3. Generate HTML
             let html = '';
-            if(dataNotes.length > 0) {
+            if (dataNotes.length > 0) {
                 dataNotes.forEach(note => {
                     const dateObj = new Date(note.tanggal);
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const options = {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    };
                     const dateStr = dateObj.toLocaleDateString('id-ID', options);
 
                     let statusBadge = '';
-                    if(note.status === 'S') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">SAKIT</span>';
-                    else if(note.status === 'I') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">IZIN</span>';
-                    else if(note.status === 'A') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">ALPHA</span>';
-                    else if(note.status === 'H') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">HADIR</span>';
+                    if (note.status === 'S') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">SAKIT</span>';
+                    else if (note.status === 'I') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">IZIN</span>';
+                    else if (note.status === 'A') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">ALPHA</span>';
+                    else if (note.status === 'H') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">HADIR</span>';
 
                     html += `
                         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
