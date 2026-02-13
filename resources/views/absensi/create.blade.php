@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
 
     <style>
-        /* --- Modern Flatpickr Overrides --- */
+        /* --- Modern Flatpickr Overrides (Responsive Fix) --- */
         .flatpickr-calendar {
             background: #ffffff;
             box-shadow: none !important;
@@ -18,18 +18,41 @@
             max-width: 100% !important;
             padding: 0;
             font-family: inherit;
-            /* Ikuti font website */
+        }
+
+        /* FIX: Paksa container internal agar mengikuti lebar induk */
+        .flatpickr-rContainer {
+            width: 100%;
+        }
+
+        .flatpickr-days {
+            width: 100% !important;
+            border: none !important;
+        }
+
+        .dayContainer {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            justify-content: space-around;
         }
 
         .flatpickr-months {
             margin-bottom: 0.5rem;
             padding-top: 0.5rem;
+            /* Pastikan navigasi bulan juga rata tengah/penuh */
+            width: 100%;
         }
 
         .flatpickr-current-month {
             font-size: 1.1rem;
             font-weight: 700;
             color: #1f2937;
+            padding-top: 0;
+            /* Rapikan padding atas */
+            width: 75%;
+            /* Beri ruang untuk panah navigasi */
+            left: 12.5%;
         }
 
         .flatpickr-current-month .flatpickr-monthDropdown-months {
@@ -52,14 +75,20 @@
             color: #9ca3af;
             font-weight: 600;
             font-size: 0.85rem;
+            /* Pastikan nama hari juga terdistribusi rata */
+            flex: 1;
         }
 
+        /* Style Tanggal */
         .flatpickr-day {
             border-radius: 0.5rem !important;
             border: 1px solid transparent;
             font-weight: 500;
             color: #d1d5db;
-            /* Default disabled */
+            /* FIX: Hapus max-width default library dan gunakan Flex basis */
+            max-width: initial !important;
+            flex-basis: 14.2857% !important;
+            /* 100% dibagi 7 hari */
             height: 40px;
             line-height: 40px;
             margin-top: 2px;
@@ -119,7 +148,6 @@
                                     <select id="bulan" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all filter-trigger cursor-pointer">
                                         @foreach(range(1, 12) as $m)
                                         <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
-                                            {{-- Fix: Gunakan create(null, $m, 1) agar aman dari overflow tanggal 31 --}}
                                             {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
                                         </option>
                                         @endforeach
@@ -146,7 +174,6 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 @foreach($kelompok_jadwal as $group)
                                 @php
-                                // Ambil item pertama sebagai perwakilan data Mapel & Kelas
                                 $jadwal_utama = $group->first();
                                 @endphp
 
@@ -294,11 +321,10 @@
         let fpInstance;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Flatpickr
             const tanggalInput = document.getElementById('tanggal');
 
             fpInstance = flatpickr(tanggalInput, {
-                locale: 'id', // Pastikan Locale ID aktif di sini
+                locale: 'id',
                 dateFormat: "Y-m-d",
                 inline: true,
                 animate: true,
@@ -309,18 +335,13 @@
                 }
             });
 
-            // Listener untuk perubahan Bulan/Tahun
             document.querySelectorAll('.filter-trigger').forEach(el => {
                 el.addEventListener('change', function() {
-
-                    // A. Sinkronisasi Visual Kalender
                     const bulan = document.getElementById('bulan').value;
                     const tahun = document.getElementById('tahun').value;
 
-                    // Lompat ke tanggal 1 bulan terpilih
                     fpInstance.jumpToDate(`${tahun}-${bulan}-01`);
 
-                    // B. Fetch Data Baru (jika kelas sudah dipilih)
                     if (document.getElementById('id_mapel').value) {
                         fetchTanggalAvailable();
                     }
@@ -328,9 +349,7 @@
             });
         });
 
-        // Function dipanggil saat Card Kelas diklik
         function pilihJadwal(el, idMapel, idKelas, namaMapel, namaKelas) {
-            // Visual Update Card
             document.querySelectorAll('.jadwal-card').forEach(card => {
                 card.classList.remove('ring-2', 'ring-indigo-600', 'bg-indigo-50', 'border-indigo-600');
                 card.querySelector('.checkmark').classList.add('hidden');
@@ -338,20 +357,16 @@
             el.classList.add('ring-2', 'ring-indigo-600', 'bg-indigo-50', 'border-indigo-600');
             el.querySelector('.checkmark').classList.remove('hidden');
 
-            // Update Input Hidden
             document.getElementById('id_mapel').value = idMapel;
             document.getElementById('id_kelas').value = idKelas;
             document.getElementById('kombinasi_jadwal').value = `${idKelas}-${idMapel}`;
 
-            // Update Teks Preview
             document.getElementById('preview-mapel').innerText = namaMapel;
             document.getElementById('preview-kelas').innerText = namaKelas;
 
-            // Reset Panel Bawah
             document.getElementById('selection-preview').classList.add('hidden');
             document.getElementById('empty-state-action').classList.remove('hidden');
 
-            // Fetch Jadwal
             fetchTanggalAvailable();
         }
 
@@ -366,45 +381,36 @@
 
             if (!mapel || !kelas) return;
 
-            // Tampilkan Loading
             loading.classList.remove('hidden');
             statusText.innerText = "";
-
-            // Disable kalender sementara
             document.getElementById('tanggal').disabled = true;
 
             try {
-                // Gunakan Blade route di sini agar URL pasti benar
+                // Route ini diasumsikan ada dan sesuai
                 const url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`;
 
                 const response = await fetch(url);
-
                 if (!response.ok) throw new Error("Gagal mengambil data");
 
                 const data = await response.json();
                 const validDates = data.map(item => item.tanggal);
 
-                // Update Flatpickr
                 fpInstance.clear();
-
-                // Pastikan kalender ada di bulan yang benar (redundancy check)
                 fpInstance.jumpToDate(`${tahun}-${bulan}-01`);
 
                 if (validDates.length > 0) {
                     fpInstance.set('enable', validDates);
                     statusText.innerHTML = `<span class="text-green-600 font-bold">✓ Tersedia ${validDates.length} hari pertemuan.</span>`;
                 } else {
-                    fpInstance.set('enable', []); // Tidak ada jadwal
+                    fpInstance.set('enable', []);
                     statusText.innerHTML = `<span class="text-orange-500 font-bold">⚠ Tidak ada jadwal ditemukan bulan ini.</span>`;
                 }
 
             } catch (error) {
                 console.error("Error:", error);
                 statusText.innerHTML = `<span class="text-red-500">Gagal memuat jadwal. Cek koneksi.</span>`;
-                // Fallback: enable semua tanggal jika error, supaya user tidak stuck
                 fpInstance.set('enable', []);
             } finally {
-                // Sembunyikan Loading (PENTING: ini harus jalan apapun yang terjadi)
                 loading.classList.add('hidden');
                 document.getElementById('tanggal').disabled = false;
             }
@@ -417,17 +423,14 @@
             emptyState.classList.add('hidden');
             panel.classList.remove('hidden');
 
-            // Format Tanggal Indonesia (Panel Preview)
             const options = {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             };
-            // Pastikan locale 'id-ID' digunakan
             document.getElementById('preview-tanggal').innerText = dateObj.toLocaleDateString('id-ID', options);
 
-            // Trigger animasi CSS
             void panel.offsetWidth;
             panel.classList.remove('translate-y-4', 'opacity-0');
         }
