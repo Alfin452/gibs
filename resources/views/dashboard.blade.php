@@ -1,4 +1,7 @@
 <x-app-layout>
+    {{-- Set Locale ID untuk View ini --}}
+    @php \Carbon\Carbon::setLocale('id'); @endphp
+
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-900 leading-tight">
             {{ __('Dashboard Guru') }}
@@ -126,6 +129,7 @@
                                     @foreach($tunggakan_absen as $t)
                                     <tr class="hover:bg-gray-50/50 transition-colors">
                                         <td class="px-6 py-4 font-medium text-gray-900">
+                                            {{-- Sudah diformat Indo di Controller --}}
                                             {{ $t['tanggal'] }}
                                             <span class="block text-xs text-gray-400 font-normal">{{ $t['hari'] }}</span>
                                         </td>

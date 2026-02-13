@@ -1,4 +1,7 @@
 <x-app-layout>
+    @php
+    \Carbon\Carbon::setLocale('id');
+    @endphp
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-900 leading-tight">
             {{ __('Rekap Kehadiran') }}

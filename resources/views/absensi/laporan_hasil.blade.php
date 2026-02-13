@@ -1,4 +1,9 @@
 <x-app-layout>
+
+    @php
+    \Carbon\Carbon::setLocale('id');
+    @endphp
+
     <style>
         .custom-scrollbar::-webkit-scrollbar {
             height: 10px;

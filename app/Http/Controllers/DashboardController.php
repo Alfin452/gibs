@@ -13,9 +13,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        // 1. Force Bahasa Indonesia untuk manipulasi tanggal di Controller ini
+        Carbon::setLocale('id');
 
-        // Pastikan user terhubung dengan data Guru
+        $user = Auth::user();
         $guru = $user->guru;
 
         if (!$guru) {
@@ -25,64 +26,49 @@ class DashboardController extends Controller
                 'total_kelas' => 0,
                 'total_mapel' => 0,
                 'progress' => 0,
-                'tunggakan' => []
+                'tunggakan_absen' => [], // Fix variabel name agar konsisten
+                'sudah_absen' => 0,
+                'total_wajib_absen' => 0
             ]);
         }
 
         $id_guru = $guru->id_guru;
 
-        // 1. DATA STATISTIK UTAMA
-        // Ambil semua jadwal guru ini
+        // --- DATA STATISTIK ---
         $jadwal_semua = Jadwal::where('id_guru', $id_guru)->get();
-
-        // Hitung Kelas unik & Mapel unik
         $total_kelas = $jadwal_semua->pluck('id_kelas')->unique()->count();
         $total_mapel = $jadwal_semua->pluck('id_mapel')->unique()->count();
 
-        // Hitung Total Siswa (dari kelas yang diajar)
         $kelas_ids = $jadwal_semua->pluck('id_kelas')->unique();
         $total_siswa = Siswa::whereIn('id_kelas', $kelas_ids)->count();
 
-        // 2. LOGIKA PROGRESS & PENGINGAT (Bulan Ini)
+        // --- LOGIKA PROGRESS & PENGINGAT ---
         $bulan_ini = Carbon::now()->month;
         $tahun_ini = Carbon::now()->year;
-        $hari_ini = Carbon::now();
 
-        // Buat rentang tanggal dari awal bulan sampai hari ini
         $start_date = Carbon::createFromDate($tahun_ini, $bulan_ini, 1);
-        $end_date = Carbon::now(); // Sampai hari ini saja
+        $end_date = Carbon::now();
 
         $total_wajib_absen = 0;
         $sudah_absen = 0;
         $tunggakan_absen = [];
 
-        // Mapping hari Inggris ke Indonesia (sesuai database jadwal)
-        $map_hari = [
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            'Saturday' => 'Sabtu',
-            'Sunday' => 'Minggu'
-        ];
-
-        // Loop setiap hari dari tanggal 1 sampai hari ini
+        // Loop tanggal
         for ($date = $start_date->copy(); $date->lte($end_date); $date->addDay()) {
-
-            // Jangan hitung hari Minggu (opsional)
             if ($date->isSunday()) continue;
 
-            $nama_hari = $map_hari[$date->format('l')];
+            // Kita gunakan translatedFormat('l') untuk mendapatkan nama hari (Senin, Selasa...)
+            // Pastikan database kolom 'hari' isinya: Senin, Selasa, Rabu, Kamis, Jumat, Sabtu
+            $nama_hari_indo = $date->translatedFormat('l');
             $tanggal_sql = $date->format('Y-m-d');
 
-            // Cari jadwal guru pada hari tersebut
-            $jadwal_harian = $jadwal_semua->where('hari', $nama_hari);
+            // Cari jadwal pada hari tersebut
+            // Note: Pastikan data di DB kolom 'hari' sesuai dengan output $nama_hari_indo
+            $jadwal_harian = $jadwal_semua->where('hari', $nama_hari_indo);
 
             foreach ($jadwal_harian as $jadwal) {
                 $total_wajib_absen++;
 
-                // Cek apakah sudah ada input di kehadiran_harian
                 $cek = KehadiranHarian::where('id_guru', $id_guru)
                     ->where('id_kelas', $jadwal->id_kelas)
                     ->where('id_mapel', $jadwal->id_mapel)
@@ -92,21 +78,20 @@ class DashboardController extends Controller
                 if ($cek) {
                     $sudah_absen++;
                 } else {
-                    // Masukkan ke daftar tunggakan/pengingat
                     $tunggakan_absen[] = [
+                        // Format Tanggal: "12 Februari 2026"
                         'tanggal' => $date->translatedFormat('d F Y'),
-                        'hari' => $nama_hari,
+                        // Nama Hari: "Senin"
+                        'hari' => $nama_hari_indo,
                         'kelas' => $jadwal->kelas->nama_kelas ?? '-',
                         'mapel' => $jadwal->mapel->nama_mapel ?? '-',
-                        'jam' => \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i'),
-                        // Link untuk input cepat
-                        'link' => route('absensi.create') // Nanti bisa dikembangkan auto-fill
+                        'jam' => Carbon::parse($jadwal->jam_mulai)->format('H:i'),
+                        'link' => route('absensi.create')
                     ];
                 }
             }
         }
 
-        // Hitung Persentase Progress
         $progress = ($total_wajib_absen > 0) ? round(($sudah_absen / $total_wajib_absen) * 100) : 0;
 
         return view('dashboard', compact(
