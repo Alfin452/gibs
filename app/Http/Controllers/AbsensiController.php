@@ -392,32 +392,83 @@ class AbsensiController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Validasi apakah user adalah guru
         if (!$user->guru) {
             return redirect()->route('dashboard')->with('error', 'Anda tidak terdaftar sebagai Guru.');
         }
 
         $id_guru = $user->guru->id_guru;
 
-        // 2. Ambil semua ID Kelas yang ada di jadwal guru ini
-        // pluck('id_kelas') mengambil array [1, 2, 5, ...]
-        $id_kelas_diampu = Jadwal::where('id_guru', $id_guru)
-            ->pluck('id_kelas')
-            ->unique() // Hindari duplikat ID jika guru mengajar mapel beda di kelas sama
-            ->toArray();
+        // QUERY BARU: Ambil kombinasi unik (Kelas + Mapel) dari Jadwal
+        // Kita gunakan distinct() agar jika ada jadwal Senin & Kamis, tetap muncul 1 kartu saja.
+        $query = Jadwal::where('id_guru', $id_guru)
+            ->select('id_kelas', 'id_mapel') // Hanya ambil kolom grouping
+            ->distinct() // Pastikan unik
+            ->with([
+                'mapel',
+                'kelas' => function ($q) {
+                    $q->withCount('siswa'); // Hitung jumlah siswa sekalian
+                }
+            ]);
 
-        // 3. Query Kelas dengan Filter
-        $query = Kelas::withCount('siswa')
-            ->whereIn('id_kelas', $id_kelas_diampu); // <--- Filter Utama
-
-        // 4. Fitur Pencarian (Search hanya mencari di dalam kelas yang diampu)
+        // Fitur Pencarian
         if ($request->filled('search')) {
-            $query->where('nama_kelas', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->whereHas('kelas', function ($q) use ($search) {
+                $q->where('nama_kelas', 'like', '%' . $search . '%');
+            })->orWhereHas('mapel', function ($m) use ($search) {
+                $m->where('nama_mapel', 'like', '%' . $search . '%');
+            });
         }
 
-        $kelas = $query->orderBy('nama_kelas', 'asc')->paginate(12)->withQueryString();
+        // Paginate hasil
+        $daftar_kelas = $query->paginate(12)->withQueryString();
 
-        // Arahkan ke folder: resources/views/absensi/kelas/index.blade.php
-        return view('absensi.kelas.index', compact('kelas'));
+        return view('absensi.kelas.index', compact('daftar_kelas'));
+    }
+
+    public function show(Request $request, $id_kelas, $id_mapel)
+    {
+        $guru = Auth::user()->guru;
+
+        $kelas = \App\Models\Kelas::findOrFail($id_kelas);
+        $mapel = \App\Models\Mapel::findOrFail($id_mapel);
+
+        // Filter Search
+        $query = \App\Models\Siswa::where('id_kelas', $id_kelas);
+        if ($request->filled('search')) {
+            $query->where('nama_siswa', 'like', '%' . $request->search . '%');
+        }
+        $siswa = $query->orderBy('nama_siswa', 'asc')->get();
+
+        foreach ($siswa as $s) {
+            // Query Base
+            $queryAbsen = \App\Models\KehadiranHarian::where('id_siswa', $s->id_siswa)
+                ->where('id_kelas', $id_kelas)
+                ->where('id_mapel', $id_mapel)
+                ->where('id_guru', $guru->id_guru);
+
+            // 1. Hitung Statistik
+            $s->total_hadir = (clone $queryAbsen)->where('status', 'H')->count();
+            $s->total_sakit = (clone $queryAbsen)->where('status', 'S')->count();
+            $s->total_izin  = (clone $queryAbsen)->where('status', 'I')->count();
+            $s->total_alpha = (clone $queryAbsen)->where('status', 'A')->count();
+
+            // 2. Ambil List Keterangan (Hanya yang ada isinya)
+            $s->list_keterangan = (clone $queryAbsen)
+                ->whereNotNull('keterangan')
+                ->where('keterangan', '!=', '')
+                ->orderBy('tanggal', 'desc')
+                ->get(['tanggal', 'status', 'keterangan']); // Ambil kolom penting saja
+
+            // 3. Rumus Persentase (Logika Awal: Hadir Fisik)
+            // Pembagi = H + S + I + A (Total data yang masuk)
+            $total_data = $s->total_hadir + $s->total_sakit + $s->total_izin + $s->total_alpha;
+
+            $s->persentase = $total_data > 0
+                ? round(($s->total_hadir / $total_data) * 100)
+                : 0;
+        }
+
+        return view('absensi.show', compact('kelas', 'mapel', 'siswa'));
     }
 }

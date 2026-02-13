@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Daftar Kelas') }}
+            {{ __('Daftar Kelas & Mapel') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4">
-
                 <div class="flex items-center gap-4 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100">
                     <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,8 +16,8 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Kelas</p>
-                        <p class="text-xl font-bold text-gray-900 leading-none">{{ $kelas->total() }}</p>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Item</p>
+                        <p class="text-xl font-bold text-gray-900 leading-none">{{ $daftar_kelas->total() }}</p>
                     </div>
                 </div>
 
@@ -28,44 +27,51 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama kelas..." class="pl-10 block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all hover:border-indigo-300">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kelas atau mapel..." class="pl-10 block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all hover:border-indigo-300">
                 </form>
             </div>
 
-            @if($kelas->count() > 0)
+            @if($daftar_kelas->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @foreach($kelas as $k)
-                <div class="group bg-white rounded-2xl p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 relative overflow-hidden">
+                @foreach($daftar_kelas as $item)
+                <div class="group bg-white rounded-2xl p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 relative overflow-hidden flex flex-col h-full">
 
                     <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-indigo-50 to-white rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 ease-out"></div>
 
-                    <div class="relative z-10">
+                    <div class="relative z-10 flex-1">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm">
-                                <span class="text-lg font-bold">{{ substr($k->nama_kelas, 0, 2) }}</span>
+                                <span class="text-lg font-bold">{{ substr($item->kelas->nama_kelas, 0, 2) }}</span>
                             </div>
                             <span class="bg-gray-50 text-gray-400 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-100">
-                                #{{ $k->id_kelas }}
+                                #{{ $item->kelas->id_kelas }}
                             </span>
                         </div>
 
-                        <h3 class="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
-                            {{ $k->nama_kelas }}
+                        <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                            {{ $item->kelas->nama_kelas }}
                         </h3>
-                        <p class="text-xs text-gray-500 font-medium mb-6">Tahun Ajaran Aktif</p>
+                        
+                        <p class="text-sm text-indigo-500 font-bold mb-4 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            {{ $item->mapel->nama_mapel }}
+                        </p>
 
-                        <div class="flex items-center justify-between border-t border-gray-50 pt-4 mt-2">
+                        <div class="border-t border-gray-50 my-4"></div>
+
+                        <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-gray-600">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
-                                <span class="text-sm font-semibold">{{ $k->siswa_count ?? 0 }}</span>
+                                <span class="text-sm font-semibold">{{ $item->kelas->siswa_count ?? 0 }}</span>
                                 <span class="text-xs text-gray-400">Siswa</span>
                             </div>
 
-                            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold flex items-center gap-1 group/link">
+                            <a href="{{ route('absensi.show', ['id_kelas' => $item->id_kelas, 'id_mapel' => $item->id_mapel]) }}" 
+                               class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1 group/link px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-all">
                                 Detail
-                                <svg class="w-3 h-3 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
                             </a>
@@ -76,7 +82,7 @@
             </div>
 
             <div class="mt-8">
-                {{ $kelas->links() }}
+                {{ $daftar_kelas->links() }}
             </div>
 
             @else
@@ -86,8 +92,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900">Tidak ada kelas ditemukan</h3>
-                <p class="text-gray-500 text-sm mt-1">Coba kata kunci lain atau belum ada data kelas.</p>
+                <h3 class="text-lg font-bold text-gray-900">Tidak ada jadwal ditemukan</h3>
+                <p class="text-gray-500 text-sm mt-1">Anda belum memiliki jadwal mengajar.</p>
             </div>
             @endif
 

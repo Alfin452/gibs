@@ -25,6 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/absensi/show/{id_kelas}/{id_mapel}', [App\Http\Controllers\AbsensiController::class, 'show'])->name('absensi.show');
+    Route::get('/absensi/detail/{id_kelas}/{id_mapel}', [App\Http\Controllers\AbsensiController::class, 'detail'])->name('absensi.detail');
+
     // Group Absensi
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiController::class, 'index'])->name('index');
