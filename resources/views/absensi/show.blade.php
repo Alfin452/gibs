@@ -24,24 +24,8 @@
         </div>
     </x-slot>
 
-    <div class="py-2">
-        <div class="max-w-7xl mx-auto px-2<nav class=" flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li>
-                    <a href="{{ route('absensi.daftar-kelas') }}" class="text-gray-500 hover:text-indigo-600 transition-colors text-sm font-medium">
-                        Daftar Kelas
-                    </a>
-                </li>
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
-                        </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-800 md:ml-2">{{ $kelas->nama_kelas }}</span>
-                    </div>
-                </li>
-            </ol>
-            </nav> sm:px-6 lg:px-2">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 relative">
 
@@ -58,7 +42,6 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-
                         <form id="search-form" action="{{ route('absensi.show', ['id_kelas' => $kelas->id_kelas, 'id_mapel' => $mapel->id_mapel]) }}" method="GET" class="relative w-full sm:w-64">
                             <input type="text"
                                 id="search-input"
@@ -175,35 +158,44 @@
 
     <div id="noteModal" class="relative z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
-        <div id="noteModalBackdrop" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity opacity-0 z-[9998]"></div>
+        <div id="noteModalBackdrop" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity opacity-0"></div>
 
-        <div class="fixed inset-0 z-[9999] w-screen overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
 
-                <div id="noteModalPanel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300 ease-out border border-gray-100">
+                <div id="noteModalPanel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
 
-                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 flex justify-between items-center shadow-md">
-                        <div class="text-white">
-                            <h3 class="text-lg font-bold tracking-tight">Catatan Siswa</h3>
-                            <p class="text-indigo-100 text-xs mt-0.5 font-medium opacity-90" id="modal-student-name">Nama Siswa</p>
+                    <div class="bg-white px-6 py-6 border-b border-gray-100 flex justify-between items-start">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600 hidden sm:block">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900" id="modal-student-name">Nama Siswa</h3>
+                                <p class="text-sm text-gray-500 mt-1">Daftar riwayat izin, sakit, dan alpha.</p>
+                            </div>
                         </div>
-                        <button type="button" onclick="closeNoteModal()" class="text-indigo-100 hover:text-white hover:bg-white/10 rounded-lg p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                        <button type="button" onclick="closeNoteModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
                     </div>
 
-                    <div class="px-6 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar bg-gray-50/50">
+                    <div class="px-6 py-6 bg-gray-50/50 max-h-[60vh] overflow-y-auto custom-scrollbar">
                         <div id="modal-content" class="space-y-3">
                         </div>
                     </div>
 
-                    <div class="bg-white px-6 py-3 border-t border-gray-100 flex justify-end">
-                        <button type="button" onclick="closeNoteModal()" class="inline-flex justify-center rounded-xl border border-gray-300 px-5 py-2.5 bg-white text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
+                    <div class="bg-white px-6 py-4 border-t border-gray-100 flex justify-end">
+                        <button type="button" onclick="closeNoteModal()" class="inline-flex w-full justify-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-gray-200 hover:bg-black transition-all sm:w-auto">
                             Tutup
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -211,7 +203,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Search Debounce
+            // 1. PINDAHKAN MODAL KE BODY (FIX Z-INDEX)
+            const modalEl = document.getElementById('noteModal');
+            if (modalEl) {
+                document.body.appendChild(modalEl);
+            }
+
+            // Search Debounce Logic
             const searchInput = document.getElementById('search-input');
             const searchForm = document.getElementById('search-form');
             const searchIcon = document.getElementById('search-icon');
@@ -230,20 +228,17 @@
             }
         });
 
-        // Modal Functions with Scroll Lock
+        // --- FUNGSI MODAL BARU ---
         function openNoteModal(namaSiswa, dataNotes) {
             const modal = document.getElementById('noteModal');
             const backdrop = document.getElementById('noteModalBackdrop');
             const panel = document.getElementById('noteModalPanel');
             const contentDiv = document.getElementById('modal-content');
 
-            // 1. Lock Scroll pada Body
-            document.body.classList.add('overflow-hidden');
-
-            // 2. Set Data
+            // Set Nama Siswa
             document.getElementById('modal-student-name').innerText = namaSiswa;
 
-            // 3. Generate HTML
+            // Generate HTML Notes
             let html = '';
             if (dataNotes.length > 0) {
                 dataNotes.forEach(note => {
@@ -257,23 +252,21 @@
                     const dateStr = dateObj.toLocaleDateString('id-ID', options);
 
                     let statusBadge = '';
-                    if (note.status === 'S') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">SAKIT</span>';
-                    else if (note.status === 'I') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">IZIN</span>';
-                    else if (note.status === 'A') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">ALPHA</span>';
-                    else if (note.status === 'H') statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">HADIR</span>';
+                    if (note.status === 'S') statusBadge = '<span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">SAKIT</span>';
+                    else if (note.status === 'I') statusBadge = '<span class="px-2.5 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">IZIN</span>';
+                    else if (note.status === 'A') statusBadge = '<span class="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200">ALPHA</span>';
+                    else if (note.status === 'H') statusBadge = '<span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">HADIR</span>';
 
                     html += `
-                        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
-                            <div class="flex justify-between items-start mb-2.5">
-                                <span class="text-xs font-bold text-gray-500 flex items-center gap-1.5">
-                                    <div class="p-1 bg-gray-100 rounded text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    </div>
+                        <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     ${dateStr}
                                 </span>
                                 ${statusBadge}
                             </div>
-                            <div class="text-sm text-gray-700 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100/50">
+                            <div class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3.5 rounded-lg border border-gray-100">
                                 "${note.keterangan}"
                             </div>
                         </div>
@@ -281,23 +274,26 @@
                 });
             } else {
                 html = `
-                    <div class="text-center py-8">
-                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
-                        <p class="text-gray-500 text-sm">Tidak ada catatan untuk siswa ini.</p>
+                        <h4 class="text-gray-900 font-bold">Tidak ada catatan</h4>
+                        <p class="text-gray-500 text-sm mt-1">Siswa ini belum memiliki catatan khusus.</p>
                     </div>`;
             }
-
             contentDiv.innerHTML = html;
 
-            // 4. Show & Animate
+            // Show & Animate
             modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Lock Scroll
+
+            // Animation Frame
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
                 panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
                 panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-            }, 10);
+            }, 20);
         }
 
         function closeNoteModal() {
@@ -305,17 +301,15 @@
             const backdrop = document.getElementById('noteModalBackdrop');
             const panel = document.getElementById('noteModalPanel');
 
-            // 1. Unlock Scroll
-            document.body.classList.remove('overflow-hidden');
-
-            // 2. Reverse Animation
+            // Reverse Animation
             backdrop.classList.add('opacity-0');
             panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
             panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
 
-            // 3. Hide after animation
+            // Hide after animation finishes
             setTimeout(() => {
                 modal.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Unlock Scroll
             }, 300);
         }
     </script>
