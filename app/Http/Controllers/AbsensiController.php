@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\KehadiranHarian;
 use App\Models\Jadwal;
@@ -106,6 +107,13 @@ class AbsensiController extends Controller
             'kombinasi_jadwal' => 'required',
         ]);
 
+        $inputDate = Carbon::parse($request->tanggal)->startOfDay();
+        $serverDate = Carbon::now()->startOfDay();
+
+        if ($inputDate->gt($serverDate)) {
+            return back()->with('error', 'Anda tidak dapat melakukan absensi untuk tanggal di masa depan (Waktu Server).');
+        }
+
         // 2. Pecah string value menjadi ID terpisah
         // Format value di view: "id_kelas-id_mapel"
         $ids = explode('-', $request->kombinasi_jadwal);
@@ -149,6 +157,13 @@ class AbsensiController extends Controller
             'id_mapel' => 'required',
             'status'   => 'required|array',
         ]);
+
+        $inputDate = Carbon::parse($request->tanggal)->startOfDay();
+        $serverDate = Carbon::now()->startOfDay();
+
+        if ($inputDate->gt($serverDate)) {
+            return back()->with('error', 'Manipulasi tanggal terdeteksi. Gunakan waktu server yang valid.');
+        }
 
         $user = Auth::user();
         if (!$user->guru) {

@@ -315,12 +315,60 @@
         </div>
     </div>
 
+    <div id="warning-modal" class="relative z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity"></div>
+
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100">
+
+                    <div class="bg-white px-6 py-8 sm:p-10">
+                        <div class="flex flex-col sm:flex-row sm:items-start gap-6">
+
+                            <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-amber-50 sm:mx-0 ring-8 ring-amber-50/50">
+                                <svg class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </div>
+
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-2xl font-bold leading-6 text-gray-900 mb-4" id="modal-title">
+                                    Akses Belum Tersedia
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-base text-gray-600 leading-relaxed" id="warning-message-content">
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-10 border-t border-gray-100">
+                        <button type="button" onclick="closeWarningModal()"
+                            class="inline-flex w-full justify-center rounded-xl bg-gray-900 px-6 py-3 text-base font-bold text-white shadow-lg shadow-gray-200 hover:bg-black hover:-translate-y-0.5 transition-all sm:w-auto">
+                            Saya Mengerti
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <script>
         let fpInstance;
+        const serverDateToday = "{{ \Carbon\Carbon::now()->format('Y-m-d') }}";
 
         document.addEventListener('DOMContentLoaded', function() {
+            // --- 1. PINDAHKAN MODAL KE BODY AGAR FULL SCREEN & DI ATAS SIDEBAR ---
+            const modalEl = document.getElementById('warning-modal');
+            if (modalEl) {
+                document.body.appendChild(modalEl);
+            }
+            // ---------------------------------------------------------------------
+
             const tanggalInput = document.getElementById('tanggal');
 
             fpInstance = flatpickr(tanggalInput, {
@@ -329,12 +377,22 @@
                 inline: true,
                 animate: true,
                 onChange: function(selectedDates, dateStr) {
+                    // Cek Tanggal Masa Depan
+                    if (dateStr > serverDateToday) {
+                        showWarningModal(dateStr);
+
+                        fpInstance.clear();
+                        document.getElementById('selection-preview').classList.add('hidden');
+                        return;
+                    }
+
                     if (dateStr) {
                         showConfirmationPanel(selectedDates[0]);
                     }
                 }
             });
 
+            // Event Listener Filter
             document.querySelectorAll('.filter-trigger').forEach(el => {
                 el.addEventListener('change', function() {
                     const bulan = document.getElementById('bulan').value;
@@ -349,7 +407,42 @@
             });
         });
 
+        // --- FUNGSI MODAL ---
+        function showWarningModal(dateStr) {
+            const modal = document.getElementById('warning-modal');
+            const msgContainer = document.getElementById('warning-message-content');
+
+            const dateObj = new Date(dateStr);
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const formattedDate = dateObj.toLocaleDateString('id-ID', options);
+
+            msgContainer.innerHTML = `
+            Maaf, jadwal untuk tanggal <span class="font-bold text-amber-600">${formattedDate}</span> belum bisa diisi saat ini.<br><br>
+            Sistem mencatat tanggal server hari ini adalah <span class="font-bold text-gray-800">${serverDateToday}</span>. Anda hanya dapat mengisi absensi untuk hari ini atau hari sebelumnya.
+        `;
+
+            modal.classList.remove('hidden');
+
+            // Matikan scroll pada body saat modal muncul
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWarningModal() {
+            const modal = document.getElementById('warning-modal');
+            modal.classList.add('hidden');
+
+            // Hidupkan kembali scroll body
+            document.body.style.overflow = 'auto';
+        }
+        // -------------------------
+
         function pilihJadwal(el, idMapel, idKelas, namaMapel, namaKelas) {
+            // ... (kode pilihJadwal sama seperti sebelumnya) ...
             document.querySelectorAll('.jadwal-card').forEach(card => {
                 card.classList.remove('ring-2', 'ring-indigo-600', 'bg-indigo-50', 'border-indigo-600');
                 card.querySelector('.checkmark').classList.add('hidden');
@@ -371,11 +464,11 @@
         }
 
         async function fetchTanggalAvailable() {
+            // ... (kode fetch sama seperti sebelumnya) ...
             const mapel = document.getElementById('id_mapel').value;
             const kelas = document.getElementById('id_kelas').value;
             const bulan = document.getElementById('bulan').value;
             const tahun = document.getElementById('tahun').value;
-
             const loading = document.getElementById('loading-indicator');
             const statusText = document.getElementById('calendar-status');
 
@@ -386,9 +479,7 @@
             document.getElementById('tanggal').disabled = true;
 
             try {
-                // Route ini diasumsikan ada dan sesuai
                 const url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`;
-
                 const response = await fetch(url);
                 if (!response.ok) throw new Error("Gagal mengambil data");
 
@@ -400,15 +491,15 @@
 
                 if (validDates.length > 0) {
                     fpInstance.set('enable', validDates);
-                    statusText.innerHTML = `<span class="text-green-600 font-bold">✓ Tersedia ${validDates.length} hari pertemuan.</span>`;
+                    statusText.innerHTML = `<span class="text-emerald-600 font-bold flex items-center justify-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tersedia ${validDates.length} jadwal pertemuan.</span>`;
                 } else {
                     fpInstance.set('enable', []);
-                    statusText.innerHTML = `<span class="text-orange-500 font-bold">⚠ Tidak ada jadwal ditemukan bulan ini.</span>`;
+                    statusText.innerHTML = `<span class="text-amber-500 font-bold flex items-center justify-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Tidak ada jadwal ditemukan bulan ini.</span>`;
                 }
 
             } catch (error) {
                 console.error("Error:", error);
-                statusText.innerHTML = `<span class="text-red-500">Gagal memuat jadwal. Cek koneksi.</span>`;
+                statusText.innerHTML = `<span class="text-red-500 font-bold">Gagal memuat jadwal.</span>`;
                 fpInstance.set('enable', []);
             } finally {
                 loading.classList.add('hidden');
@@ -417,6 +508,7 @@
         }
 
         function showConfirmationPanel(dateObj) {
+            // ... (kode sama seperti sebelumnya) ...
             const panel = document.getElementById('selection-preview');
             const emptyState = document.getElementById('empty-state-action');
 
