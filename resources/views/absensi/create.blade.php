@@ -125,8 +125,8 @@
     \Carbon\Carbon::setLocale('id');
     @endphp
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
             <form action="{{ route('absensi.cek') }}" method="POST" id="form-absensi">
                 @csrf
                 <input type="hidden" name="id_mapel" id="id_mapel" required>

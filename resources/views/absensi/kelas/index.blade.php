@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
 
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4">
 

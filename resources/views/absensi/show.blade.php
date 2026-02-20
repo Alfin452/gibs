@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-wrap gap-4 justify-between items-center">
             <h2 class="font-bold text-xl text-gray-800 leading-tight">
                 {{ __('Detail Kelas') }}
             </h2>
@@ -24,8 +24,8 @@
         </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
 
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 relative">
 

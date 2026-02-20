@@ -15,10 +15,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
         .fade-in {
             animation: fadeIn 0.5s ease-out forwards;
             opacity: 0;
@@ -153,25 +149,24 @@
         });
 
         // 3. Global Logout Confirmation
-        // Script ini otomatis mencari semua form yang mengarah ke route 'logout'
         document.addEventListener('submit', function(e) {
             if (e.target && e.target.action && e.target.action.includes('logout')) {
-                e.preventDefault(); // Stop submit langsung
+                e.preventDefault();
 
                 Swal.fire({
                     title: 'Konfirmasi Keluar',
                     text: "Apakah Anda yakin ingin mengakhiri sesi ini?",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#4F46E5', // Indigo 600
-                    cancelButtonColor: '#9CA3AF', // Gray 400
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#9CA3AF',
                     confirmButtonText: 'Ya, Keluar',
                     cancelButtonText: 'Batal',
                     reverseButtons: true,
                     focusCancel: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        e.target.submit(); // Lanjutkan submit jika user klik Ya
+                        e.target.submit();
                     }
                 });
             }

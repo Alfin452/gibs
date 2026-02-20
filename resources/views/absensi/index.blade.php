@@ -8,7 +8,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-2">
+    <div class="py-1">
         <div class="max-w-[85rem] mx-auto px-1 sm:px-6 lg:px-1 space-y-6">
 
             @if (session('success'))
