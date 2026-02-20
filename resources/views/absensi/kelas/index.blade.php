@@ -53,7 +53,7 @@
                         <div class="relative z-10 flex-1">
                             <div class="flex justify-between items-start mb-4">
                                 <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm">
-                                    <span class="text-lg font-bold">{{ substr($item->kelas->nama_kelas, 0, 2) }}</span>
+                                    <span class="text-lg font-bold">{{ explode(' ', trim($item->kelas->nama_kelas))[0] }}</span>
                                 </div>
                                 <span class="bg-gray-50 text-gray-400 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-100">
                                     #{{ $item->kelas->id_kelas }}
