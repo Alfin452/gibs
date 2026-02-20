@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-900 leading-tight">
             {{ __('Input Kehadiran Baru') }}
@@ -125,8 +125,8 @@
     \Carbon\Carbon::setLocale('id');
     @endphp
 
-    <div class="py-1">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
             <form action="{{ route('absensi.cek') }}" method="POST" id="form-absensi">
                 @csrf
                 <input type="hidden" name="id_mapel" id="id_mapel" required>
@@ -527,4 +527,4 @@
             panel.classList.remove('translate-y-4', 'opacity-0');
         }
     </script>
-</x-app-layout>
+</x-absen-layout>

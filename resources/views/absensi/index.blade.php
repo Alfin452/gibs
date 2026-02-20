@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
     @php
     \Carbon\Carbon::setLocale('id');
     @endphp
@@ -8,8 +8,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-1">
-        <div class="max-w-[85rem] mx-auto px-1 sm:px-6 lg:px-1 space-y-6">
+    <div class="py-2">
+        <div class="max-w-[85rem] mx-auto px-1 sm:px-6 lg:px-2 space-y-6">
 
             @if (session('success'))
             <div id="alert-success" class="flex items-center p-4 mb-4 text-emerald-800 border border-emerald-200 rounded-xl bg-emerald-50 shadow-sm transition-all duration-500" role="alert">
@@ -351,4 +351,4 @@
             }
         }
     </script>
-</x-app-layout>
+</x-absen-layout>

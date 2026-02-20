@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Absensi;
 
+use App\Http\Controllers\Controller; 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\KehadiranHarian;

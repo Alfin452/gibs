@@ -1,12 +1,12 @@
-<x-app-layout>
+<x-absen-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-900 leading-tight">
             {{ __('Daftar Kelas & Mapel') }}
         </h2>
     </x-slot>
 
-    <div class="py-1">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
 
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4">
 
@@ -201,4 +201,4 @@
             }
         });
     </script>
-</x-app-layout>
+</x-absen-layout>

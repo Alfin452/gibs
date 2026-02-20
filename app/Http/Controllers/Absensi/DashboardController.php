@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Absensi;
 
+use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Jadwal;
@@ -20,7 +21,7 @@ class DashboardController extends Controller
         $guru = $user->guru;
 
         if (!$guru) {
-            return view('dashboard', [
+            return view('absensi.dashboard', [
                 'error' => 'Akun tidak terhubung dengan data Guru.',
                 'total_siswa' => 0,
                 'total_kelas' => 0,
@@ -97,7 +98,7 @@ class DashboardController extends Controller
 
         $progress = ($total_wajib_absen > 0) ? round(($sudah_absen / $total_wajib_absen) * 100) : 0;
 
-        return view('dashboard', compact(
+        return view('absensi.dashboard', compact(
             'guru',
             'total_siswa',
             'total_kelas',

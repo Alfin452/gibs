@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
     <x-slot name="header">
         <div class="flex flex-wrap gap-4 justify-between items-center">
             <h2 class="font-bold text-xl text-gray-800 leading-tight">
@@ -24,8 +24,8 @@
         </div>
     </x-slot>
 
-    <div class="py-1">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
+    <div class="py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
 
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 relative">
 

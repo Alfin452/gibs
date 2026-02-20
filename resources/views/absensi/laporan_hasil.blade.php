@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
 
     @php
     \Carbon\Carbon::setLocale('id');
@@ -41,7 +41,7 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-1">
+    <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-2">
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>

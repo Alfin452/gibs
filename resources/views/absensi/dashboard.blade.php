@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
     {{-- Set Locale ID untuk View ini --}}
     @php \Carbon\Carbon::setLocale('id'); @endphp
 
@@ -195,4 +195,4 @@
 
         </div>
     </div>
-</x-app-layout>
+</x-absen-layout>

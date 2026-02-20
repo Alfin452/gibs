@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-absen-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Laporan Rekapitulasi Bulanan
@@ -58,4 +58,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-absen-layout>
