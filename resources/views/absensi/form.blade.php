@@ -7,7 +7,19 @@
             <h2 class="font-bold text-2xl text-gray-800 leading-tight">
                 {{ __('Lembar Absensi Siswa') }}
             </h2>
-            <div class="flex items-center gap-3 text-sm text-right">
+            <div class="flex flex-wrap items-center gap-3 text-sm text-right">
+                
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Keterangan</p>
+                    <div class="flex items-center gap-2 mt-0.5 text-xs font-bold">
+                        <span class="text-green-600">H=Hadir</span>
+                        <span class="text-blue-600">S=Sakit</span>
+                        <span class="text-yellow-600">I=Izin</span>
+                        <span class="text-red-600">A=Alpha</span>
+                        <span class="text-gray-500">L=Libur</span>
+                    </div>
+                </div>
+
                 <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Kelas</p>
                     <p class="font-bold text-indigo-600">{{ $infoKelas->nama_kelas }}</p>

@@ -11,22 +11,6 @@
     <div class="py-2">
         <div class="max-w-[85rem] mx-auto px-1 sm:px-6 lg:px-2 space-y-6">
 
-            @if (session('success'))
-            <div id="alert-success" class="flex items-center p-4 mb-4 text-emerald-800 border border-emerald-200 rounded-xl bg-emerald-50 shadow-sm transition-all duration-500" role="alert">
-                <svg class="flex-shrink-0 w-5 h-5 mr-3 text-emerald-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-                </svg>
-                <div class="ml-1 text-sm font-medium">
-                    <span class="font-bold block text-emerald-900">Berhasil!</span> {{ session('success') }}
-                </div>
-                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-emerald-50 text-emerald-500 rounded-lg focus:ring-2 focus:ring-emerald-400 p-1.5 hover:bg-emerald-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-success" aria-label="Close" onclick="this.parentElement.remove()">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                    </svg>
-                </button>
-            </div>
-            @endif
-
             @if (session('warning'))
             <div id="alert-warning" class="flex items-center p-4 mb-4 text-yellow-800 border border-yellow-200 rounded-xl bg-yellow-50 shadow-sm" role="alert">
                 <svg class="flex-shrink-0 w-5 h-5 mr-3 text-yellow-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -43,7 +27,7 @@
 
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-5">
                         <div class="space-y-1">
-                            <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">Riwayat Absensi</h3>
+                            <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">Riwayat Presensi</h3>
                             <p class="text-sm text-gray-500 font-medium">Monitoring data kehadiran siswa secara real-time.</p>
                         </div>
 
