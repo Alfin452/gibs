@@ -139,6 +139,13 @@
                 </a>
 
                 {{-- MENU BARU: HRT Time --}}
+                @php
+                // Mengecek apakah user adalah guru dan memiliki is_hrt yang valid (tidak null/0)
+                $isHrt = Auth::user()?->guru?->is_hrt;
+                @endphp
+
+                @if($isHrt)
+                {{-- Tampilan jika Guru adalah HRT --}}
                 <a href="#"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('hrt.time*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-blue-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('hrt.time*'))
@@ -149,6 +156,21 @@
                     </svg>
                     <span class="text-sm">HRT Time</span>
                 </a>
+                @else
+                {{-- Tampilan jika Guru BUKAN HRT (Disabled) --}}
+                <div class="flex items-center justify-between px-4 py-3.5 rounded-xl text-blue-100/30 opacity-60 cursor-not-allowed select-none" title="Menu ini khusus untuk Homeroom Teacher">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-sm">HRT Time</span>
+                    </div>
+                    {{-- Ikon Gembok Kecil --}}
+                    <svg class="w-4 h-4 text-blue-100/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                @endif
             </nav>
 
             {{-- FOOTER / USER PROFILE --}}
