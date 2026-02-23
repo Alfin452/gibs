@@ -32,7 +32,7 @@
             </h2>
 
             <a href="{{ route('absensi.index') }}"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
@@ -46,11 +46,11 @@
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
                 <h3 class="text-2xl font-bold text-gray-800">{{ $infoKelas->nama_kelas }}</h3>
-                <p class="text-gray-500 font-medium">{{ $infoMapel->nama_mapel }}</p>
+                <p class="text-secondary-600 font-bold">{{ $infoMapel->nama_mapel }}</p>
             </div>
             <div class="text-right">
                 <div class="text-sm text-gray-400 uppercase tracking-wider font-semibold">Periode</div>
-                <div class="text-xl font-bold text-indigo-600">
+                <div class="text-xl font-bold text-primary-600">
                     {{ \Carbon\Carbon::createFromDate($tahun, (int)$bulan, 1)->translatedFormat('F') }} {{ $tahun }}
                 </div>
             </div>
@@ -77,7 +77,7 @@
                             </th>
                             @endforeach
 
-                            <th colspan="7" class="px-2 py-2 text-center font-bold text-gray-900 border-b-2 border-indigo-200 bg-indigo-50 border-l-4 border-l-indigo-200">
+                            <th colspan="7" class="px-2 py-2 text-center font-bold text-gray-900 border-b-2 border-primary-200 bg-primary-50 border-l-4 border-l-primary-200">
                                 Ringkasan Akumulasi
                             </th>
                         </tr>
@@ -86,13 +86,13 @@
                             <th class="border-r bg-gray-50 h-8"></th>
                             @endforeach
 
-                            <th class="px-3 py-2 text-center text-xs font-bold text-green-700 bg-indigo-50 border-r border-indigo-100 border-l-4 border-l-indigo-200" title="Hadir">H</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-blue-700 bg-indigo-50 border-r border-indigo-100" title="Sakit">S</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-yellow-700 bg-indigo-50 border-r border-indigo-100" title="Izin">I</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-red-700 bg-indigo-50 border-r border-indigo-100" title="Alpha">A</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-600 bg-indigo-50 border-r border-indigo-100" title="Libur">L</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-900 bg-indigo-100/50 border-r border-indigo-100" title="Total Data">Total</th>
-                            <th class="px-3 py-2 text-center text-xs font-bold text-indigo-700 bg-indigo-100/50" title="Persentase Kehadiran">Persentase %</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-green-700 bg-primary-50 border-r border-primary-100 border-l-4 border-l-primary-200" title="Hadir">H</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-blue-700 bg-primary-50 border-r border-primary-100" title="Sakit">S</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-yellow-700 bg-primary-50 border-r border-primary-100" title="Izin">I</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-red-700 bg-primary-50 border-r border-primary-100" title="Alpha">A</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-600 bg-primary-50 border-r border-primary-100" title="Libur">L</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-gray-900 bg-primary-100/50 border-r border-primary-100" title="Total Data">Total</th>
+                            <th class="px-3 py-2 text-center text-xs font-bold text-primary-700 bg-primary-100/50" title="Persentase Kehadiran">Persentase %</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -150,14 +150,14 @@
                             </td>
                             @endforeach
 
-                            <td class="px-2 py-2 text-center font-bold text-green-600 bg-indigo-50/30 border-r border-indigo-100 border-l-4 border-l-indigo-200">{{ $h }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-blue-600 bg-indigo-50/30 border-r border-indigo-100">{{ $sa }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-yellow-600 bg-indigo-50/30 border-r border-indigo-100">{{ $i }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-red-600 bg-indigo-50/30 border-r border-indigo-100">{{ $a }}</td>
-                            <td class="px-2 py-2 text-center font-bold text-gray-500 bg-indigo-50/30 border-r border-indigo-100">{{ $l }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-green-600 bg-primary-50/30 border-r border-primary-100 border-l-4 border-l-primary-200">{{ $h }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-blue-600 bg-primary-50/30 border-r border-primary-100">{{ $sa }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-yellow-600 bg-primary-50/30 border-r border-primary-100">{{ $i }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-red-600 bg-primary-50/30 border-r border-primary-100">{{ $a }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-gray-500 bg-primary-50/30 border-r border-primary-100">{{ $l }}</td>
 
-                            <td class="px-2 py-2 text-center font-bold text-gray-800 bg-indigo-100/30 border-r border-indigo-100">{{ $total_input }}</td>
-                            <td class="px-2 py-2 text-center bg-indigo-100/30 {{ $colorPersen }}">{{ $persen }}</td>
+                            <td class="px-2 py-2 text-center font-bold text-gray-800 bg-primary-100/30 border-r border-primary-100">{{ $total_input }}</td>
+                            <td class="px-2 py-2 text-center bg-primary-100/30 {{ $colorPersen }}">{{ $persen }}</td>
                             </tr>
                             @endforeach
                     </tbody>
@@ -185,4 +185,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-absen-layout>

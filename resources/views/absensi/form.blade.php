@@ -8,7 +8,7 @@
                 {{ __('Lembar Absensi Siswa') }}
             </h2>
             <div class="flex flex-wrap items-center gap-3 text-sm text-right">
-                
+
                 <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Keterangan</p>
                     <div class="flex items-center gap-2 mt-0.5 text-xs font-bold">
@@ -22,7 +22,7 @@
 
                 <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Kelas</p>
-                    <p class="font-bold text-indigo-600">{{ $infoKelas->nama_kelas }}</p>
+                    <p class="font-bold text-secondary-600">{{ $infoKelas->nama_kelas }}</p>
                 </div>
                 <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 text-left">
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tanggal</p>
@@ -34,23 +34,23 @@
 
     <div class="py-2 w-full px-4 sm:px-6 lg:px-2">
 
-        <div class="bg-indigo-600 rounded-t-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
+        <div class="bg-primary-600 rounded-t-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-lg">
             <div class="text-white">
-                <p class="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">Mata Pelajaran</p>
+                <p class="text-xs font-bold text-primary-200 uppercase tracking-wider mb-1">Mata Pelajaran</p>
                 <h3 class="text-2xl font-bold">{{ $infoMapel->nama_mapel }}</h3>
             </div>
 
-            <div class="flex gap-2 bg-indigo-700/50 p-1.5 rounded-lg backdrop-blur-sm">
+            <div class="flex gap-2 bg-primary-700/50 p-1.5 rounded-lg backdrop-blur-sm">
                 <button type="button" onclick="setSemua('H')" class="bg-white text-green-700 px-4 py-2 rounded-md text-xs font-bold hover:bg-green-50 shadow-sm transition-all flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span> Set Semua Hadir
                 </button>
-                <button type="button" onclick="setSemua('L')" class="text-white px-4 py-2 rounded-md text-xs font-bold hover:bg-indigo-600 transition-all border border-transparent hover:border-indigo-400">
+                <button type="button" onclick="setSemua('L')" class="text-white px-4 py-2 rounded-md text-xs font-bold hover:bg-primary-600 transition-all border border-transparent hover:border-primary-400">
                     Set Hari Libur
                 </button>
             </div>
         </div>
 
-        <form action="{{ route('absensi.store') }}" method="POST">
+        <form action="{{ route('absensi.store') }}" method="POST" id="form-absensi">
             @csrf
             <input type="hidden" name="tanggal" value="{{ $tanggal }}">
             <input type="hidden" name="id_kelas" value="{{ $infoKelas->id_kelas }}">
@@ -84,14 +84,14 @@
                             $ketDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->keterangan ?? '') : '';
                             @endphp
 
-                            <tr class="hover:bg-indigo-50/30 transition-colors group">
+                            <tr class="hover:bg-primary-50/30 transition-colors group">
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-medium align-middle">
                                     {{ $index + 1 }}
                                 </td>
 
                                 <td class="px-6 py-4 align-middle">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                        <span class="text-sm font-bold text-gray-900 group-hover:text-primary-700 transition-colors">
                                             {{ $s->nama_siswa }}
                                         </span>
                                         <span class="text-xs text-gray-400 font-mono mt-0.5">
@@ -104,7 +104,6 @@
                                     <div class="flex justify-center items-center gap-1 bg-gray-100 p-1.5 rounded-lg border border-gray-200 shadow-inner">
 
                                         @php
-                                        // Definisikan class LENGKAP di sini agar terbaca oleh Tailwind
                                         $options = [
                                         'H' => ['bg' => 'peer-checked:bg-green-500', 'hover' => 'hover:text-green-600', 'label' => 'Hadir'],
                                         'S' => ['bg' => 'peer-checked:bg-blue-500', 'hover' => 'hover:text-blue-600', 'label' => 'Sakit'],
@@ -119,10 +118,7 @@
                                             <input type="radio" name="status[{{ $s->id_siswa }}]" value="{{ $code }}"
                                                 class="peer sr-only" {{ (isset($statusDB) && $statusDB == $code) ? 'checked' : '' }}>
 
-                                            <div class="w-10 h-8 flex items-center justify-center rounded text-xs font-bold text-gray-400 border border-transparent
-        hover:bg-gray-50 {{ $style['hover'] }}
-        {{ $style['bg'] }} peer-checked:text-white peer-checked:shadow-md 
-        transition-all duration-200">
+                                            <div class="w-10 h-8 flex items-center justify-center rounded text-xs font-bold text-gray-400 border border-transparent hover:bg-gray-50 {{ $style['hover'] }} {{ $style['bg'] }} peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
                                                 {{ $code }}
                                             </div>
 
@@ -138,7 +134,7 @@
 
                                 <td class="px-6 py-4 align-middle">
                                     <input type="text" name="keterangan[{{ $s->id_siswa }}]" value="{{ $ketDB }}" placeholder="Tulis catatan..."
-                                        class="w-full text-sm border-gray-200 bg-gray-50 focus:bg-white rounded-md focus:border-indigo-500 focus:ring-indigo-500 transition-all placeholder-gray-400">
+                                        class="w-full text-sm border-gray-200 bg-gray-50 focus:bg-white rounded-md focus:border-primary-500 focus:ring-primary-500 transition-all placeholder-gray-400">
                                 </td>
                             </tr>
                             @endforeach
@@ -150,7 +146,7 @@
                     <p class="text-sm text-gray-500 italic hidden sm:block">
                         Pastikan semua data siswa telah dicek sebelum menyimpan.
                     </p>
-                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-primary-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                         </svg>
@@ -168,5 +164,44 @@
                 radio.checked = true;
             });
         }
+
+        // --- SCRIPT VALIDASI KONFIRMASI PENYIMPANAN ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const formAbsensi = document.getElementById('form-absensi');
+
+            if (formAbsensi) {
+                formAbsensi.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Hentikan proses submit otomatis
+
+                    Swal.fire({
+                        title: 'Konfirmasi Simpan',
+                        text: "Apakah Anda yakin data absensi siswa sudah benar?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3ab09e', // Warna Primary (Keppel)
+                        cancelButtonColor: '#9CA3AF', // Warna Gray
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Periksa Kembali',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Tampilkan state loading saat form dikirim
+                            Swal.fire({
+                                title: 'Menyimpan Data...',
+                                text: 'Mohon tunggu sebentar',
+                                allowOutsideClick: false,
+                                showConfirmButton: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            // Submit form secara manual
+                            formAbsensi.submit();
+                        }
+                    });
+                });
+            }
+        });
     </script>
 </x-absen-layout>

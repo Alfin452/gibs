@@ -32,14 +32,14 @@
                         </div>
 
                         <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                            <button onclick="openModal()" class="flex-1 md:flex-none inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 focus:ring-4 focus:ring-emerald-100 transition-all shadow-sm">
+                            <button onclick="openModal()" class="flex-1 md:flex-none inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-secondary-700 bg-secondary-50 border border-secondary-200 rounded-xl hover:bg-secondary-100 focus:ring-4 focus:ring-secondary-100 transition-all shadow-sm">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                                 Lihat Rekap
                             </button>
 
-                            <a href="{{ route('absensi.create') }}" class="flex-1 md:flex-none inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                            <a href="{{ route('absensi.create') }}" class="flex-1 md:flex-none inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 focus:ring-4 focus:ring-primary-100 shadow-lg shadow-primary-200 transition-all hover:-translate-y-0.5">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
@@ -55,19 +55,19 @@
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Pencarian</label>
                                 <div class="relative group">
                                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                         </svg>
                                     </div>
                                     <input type="text" id="search-input" name="search" value="{{ request('search') }}" placeholder="Cari Mata Pelajaran atau Kelas..."
-                                        class="pl-10 block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 shadow-sm transition-all hover:border-gray-300">
+                                        class="pl-10 block w-full rounded-xl border-gray-200 bg-white focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-3 shadow-sm transition-all hover:border-gray-300">
                                 </div>
                             </div>
 
                             <div class="md:col-span-3">
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Bulan</label>
                                 <div class="relative">
-                                    <select id="filter-bulan" name="bulan" class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 pl-4 pr-8 shadow-sm transition-all hover:border-gray-300 cursor-pointer appearance-none">
+                                    <select id="filter-bulan" name="bulan" class="block w-full rounded-xl border-gray-200 bg-white focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-3 pl-4 pr-8 shadow-sm transition-all hover:border-gray-300 cursor-pointer appearance-none">
                                         <option value="">Semua Bulan</option>
                                         @foreach(range(1, 12) as $m)
                                         <option value="{{ $m }}" {{ request('bulan') == $m ? 'selected' : '' }}>
@@ -86,7 +86,7 @@
                             <div class="md:col-span-3">
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Tahun</label>
                                 <div class="relative">
-                                    <select id="filter-tahun" name="tahun" class="block w-full rounded-xl border-gray-200 bg-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 pl-4 pr-8 shadow-sm transition-all hover:border-gray-300 cursor-pointer appearance-none">
+                                    <select id="filter-tahun" name="tahun" class="block w-full rounded-xl border-gray-200 bg-white focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-3 pl-4 pr-8 shadow-sm transition-all hover:border-gray-300 cursor-pointer appearance-none">
                                         <option value="">Semua Tahun</option>
                                         @php $cy = date('Y'); @endphp
                                         @for($y = $cy; $y >= $cy-2; $y--)
@@ -119,7 +119,7 @@
 
                     <div id="loading-indicator" class="hidden">
                         <div class="flex flex-col items-center justify-center py-12">
-                            <svg class="animate-spin h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg class="animate-spin h-10 w-10 text-primary-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
@@ -169,7 +169,7 @@
 
                     <div class="bg-white px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <div class="p-2 bg-secondary-50 rounded-lg text-secondary-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -191,7 +191,7 @@
                             <div class="space-y-5">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Mata Pelajaran</label>
-                                    <select name="id_mapel" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 text-sm py-3 transition-all cursor-pointer">
+                                    <select name="id_mapel" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary-500 focus:ring-primary-500 text-sm py-3 transition-all cursor-pointer">
                                         <option value="">-- Pilih Mapel --</option>
                                         @foreach($mapels_list as $m)
                                         <option value="{{ $m->id_mapel }}">{{ $m->nama_mapel }}</option>
@@ -201,7 +201,7 @@
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kelas</label>
-                                    <select name="id_kelas" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 text-sm py-3 transition-all cursor-pointer">
+                                    <select name="id_kelas" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary-500 focus:ring-primary-500 text-sm py-3 transition-all cursor-pointer">
                                         <option value="">-- Pilih Kelas --</option>
                                         @foreach($kelas_list as $k)
                                         <option value="{{ $k->id_kelas }}">{{ $k->nama_kelas }}</option>
@@ -212,7 +212,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Bulan</label>
-                                        <select name="bulan" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 text-sm py-3 transition-all cursor-pointer">
+                                        <select name="bulan" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary-500 focus:ring-primary-500 text-sm py-3 transition-all cursor-pointer">
                                             @foreach(range(1, 12) as $m)
                                             <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
                                                 {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
@@ -222,7 +222,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tahun</label>
-                                        <select name="tahun" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 text-sm py-3 transition-all cursor-pointer">
+                                        <select name="tahun" required class="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary-500 focus:ring-primary-500 text-sm py-3 transition-all cursor-pointer">
                                             @php $cy = date('Y'); @endphp
                                             <option value="{{ $cy }}">{{ $cy }}</option>
                                             <option value="{{ $cy-1 }}">{{ $cy-1 }}</option>
@@ -235,7 +235,7 @@
                                 <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors text-sm">
                                     Batal
                                 </button>
-                                <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all text-sm flex items-center gap-2 transform active:scale-95">
+                                <button type="submit" class="px-5 py-2.5 rounded-xl bg-secondary-500 text-white font-bold hover:bg-secondary-600 shadow-lg shadow-secondary-200 transition-all text-sm flex items-center gap-2 transform active:scale-95">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>

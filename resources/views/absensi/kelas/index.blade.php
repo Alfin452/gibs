@@ -11,7 +11,7 @@
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 gap-4">
 
                 <div class="flex items-center gap-4 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                    <div class="p-2 bg-primary-50 rounded-lg text-primary-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                         </svg>
@@ -24,11 +24,11 @@
 
                 <form id="search-form" action="{{ route('absensi.daftar-kelas') }}" method="GET" class="w-full md:w-80 relative group" onsubmit="return false;">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg id="search-loading" class="hidden animate-spin w-5 h-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg id="search-loading" class="hidden animate-spin w-5 h-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <svg id="search-icon" class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="search-icon" class="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
@@ -37,7 +37,7 @@
                         name="search"
                         value="{{ request('search') }}"
                         placeholder="Cari kelas atau mapel..."
-                        class="pl-10 block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 transition-all hover:border-indigo-300"
+                        class="pl-10 block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-3 transition-all hover:border-primary-300"
                         autocomplete="off">
                 </form>
             </div>
@@ -48,11 +48,11 @@
                     @foreach($daftar_kelas as $item)
                     <div class="group bg-white rounded-2xl p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 relative overflow-hidden flex flex-col h-full">
 
-                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-indigo-50 to-white rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-primary-50 to-white rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 ease-out"></div>
 
                         <div class="relative z-10 flex-1">
                             <div class="flex justify-between items-start mb-4">
-                                <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                                     <span class="text-lg font-bold">{{ explode(' ', trim($item->kelas->nama_kelas))[0] }}</span>
                                 </div>
                                 <span class="bg-gray-50 text-gray-400 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-100">
@@ -60,11 +60,11 @@
                                 </span>
                             </div>
 
-                            <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
                                 {{ $item->kelas->nama_kelas }}
                             </h3>
 
-                            <p class="text-sm text-indigo-500 font-bold mb-4 flex items-center gap-1">
+                            <p class="text-sm text-secondary-500 font-bold mb-4 flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                 </svg>
@@ -83,7 +83,7 @@
                                 </div>
 
                                 <a href="{{ route('absensi.show', ['id_kelas' => $item->id_kelas, 'id_mapel' => $item->id_mapel]) }}"
-                                    class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1 group/link px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-all">
+                                    class="text-primary-600 hover:text-primary-800 text-sm font-bold flex items-center gap-1 group/link px-3 py-1.5 rounded-lg hover:bg-primary-50 transition-all">
                                     Detail
                                     <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -124,7 +124,6 @@
             let debounceTimer;
 
             // Template Kartu Skeleton (Loading)
-            // Kita buat 8 kartu dummy agar grid terlihat penuh
             const skeletonCard = `
                 <div class="bg-white rounded-2xl p-6 border border-gray-100 animate-pulse relative h-full">
                     <div class="flex justify-between items-start mb-4">
@@ -143,7 +142,7 @@
                 </div>
             `;
 
-            // Grid Skeleton (Mengulang kartu skeleton 8 kali)
+            // Grid Skeleton 
             const skeletonGrid = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     ${skeletonCard.repeat(8)}

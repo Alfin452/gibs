@@ -7,7 +7,7 @@
             <nav class="flex" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li>
-                        <a href="{{ route('absensi.daftar-kelas') }}" class="text-gray-500 hover:text-indigo-600 transition-colors text-sm font-medium">
+                        <a href="{{ route('absensi.daftar-kelas') }}" class="text-gray-500 hover:text-primary-600 transition-colors text-sm font-medium">
                             Daftar Kelas
                         </a>
                     </li>
@@ -32,12 +32,12 @@
                 <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50/30 rounded-t-3xl">
 
                     <div class="flex items-center gap-4 w-full md:w-auto">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-primary-600 flex items-center justify-center text-white shadow-lg shadow-primary-200 shrink-0">
                             <span class="text-xl font-bold">{{ substr($kelas->nama_kelas, 0, 2) }}</span>
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-gray-900 leading-tight">{{ $kelas->nama_kelas }}</h2>
-                            <p class="text-sm text-indigo-600 font-semibold">{{ $mapel->nama_mapel }}</p>
+                            <p class="text-sm text-secondary-500 font-bold">{{ $mapel->nama_mapel }}</p>
                         </div>
                     </div>
 
@@ -47,12 +47,12 @@
                                 id="search-input"
                                 name="search"
                                 value="{{ request('search') }}"
-                                class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-gray-400 shadow-sm"
+                                class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all placeholder-gray-400 shadow-sm"
                                 placeholder="Cari siswa..."
                                 autocomplete="off">
 
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg id="search-loading" class="hidden animate-spin w-5 h-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg id="search-loading" class="hidden animate-spin w-5 h-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -81,17 +81,17 @@
 
                         <tbody id="siswa-table-body" class="divide-y divide-gray-50 bg-white">
                             @forelse($siswa as $index => $s)
-                            <tr class="hover:bg-indigo-50/30 transition-colors group">
-                                <td class="px-6 py-4 text-center text-gray-400 font-medium group-hover:text-indigo-500">
+                            <tr class="hover:bg-primary-50/30 transition-colors group">
+                                <td class="px-6 py-4 text-center text-gray-400 font-medium group-hover:text-primary-500">
                                     {{ $loop->iteration }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-white border border-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-white border border-primary-50 flex items-center justify-center text-primary-700 font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">
                                             {{ substr($s->nama_siswa, 0, 1) }}
                                         </div>
                                         <div>
-                                            <div class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $s->nama_siswa }}</div>
+                                            <div class="font-bold text-gray-900 group-hover:text-primary-700 transition-colors">{{ $s->nama_siswa }}</div>
                                             <div class="text-xs text-gray-400 font-mono">{{ $s->nisn ?? 'NISN -' }}</div>
                                         </div>
                                     </div>
@@ -119,7 +119,7 @@
                                 <td class="px-6 py-4 text-center">
                                     @if(count($s->list_keterangan) > 0)
                                     <button onclick="openNoteModal('{{ $s->nama_siswa }}', {{ json_encode($s->list_keterangan) }})"
-                                        class="inline-flex items-center justify-center w-8 h-8 text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all duration-200" title="Lihat Catatan">
+                                        class="inline-flex items-center justify-center w-8 h-8 text-primary-600 bg-primary-50 border border-primary-100 rounded-lg hover:bg-primary-600 hover:text-white hover:shadow-md transition-all duration-200" title="Lihat Catatan">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -138,7 +138,7 @@
                                             </span>
                                         </div>
                                         <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div class="h-full rounded-full {{ $s->persentase >= 90 ? 'bg-emerald-500' : ($s->persentase >= 75 ? 'bg-indigo-500' : 'bg-rose-500') }}"
+                                            <div class="h-full rounded-full {{ $s->persentase >= 90 ? 'bg-emerald-500' : ($s->persentase >= 75 ? 'bg-primary-500' : 'bg-rose-500') }}"
                                                 style="width: {{ $s->persentase }}"></div>
                                         </div>
                                     </div>
@@ -165,7 +165,7 @@
                 <div id="noteModalPanel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                     <div class="bg-white px-6 py-6 border-b border-gray-100 flex justify-between items-start">
                         <div class="flex items-start gap-4">
-                            <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600 hidden sm:block">
+                            <div class="p-3 bg-primary-50 rounded-xl text-primary-600 hidden sm:block">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -352,4 +352,4 @@
             }, 300);
         }
     </script>
-    </x-app-layout>
+</x-absen-layout>
