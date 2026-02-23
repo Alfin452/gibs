@@ -25,7 +25,27 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                @if(isset($kelas_hrt))
+                <div class="bg-white p-6 rounded-2xl border border-amber-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-50 rounded-full z-0"></div>
+
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="badge-gibs">
+                                <p class="text-sm font-medium text-gray-500 fas fa-star">HRT Kelas <strong class="text-amber-600">{{ $kelas_hrt->nama_kelas }}</strong></p>
+                            </span>
+                            <h4 class="text-2xl font-bold text-gray-900">{{ $jumlah_siswa_hrt }} <span class="text-sm font-normal text-gray-400">Siswa</span></h4>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center gap-4">
