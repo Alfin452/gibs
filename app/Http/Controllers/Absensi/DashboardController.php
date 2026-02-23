@@ -43,6 +43,17 @@ class DashboardController extends Controller
         $kelas_ids = $jadwal_semua->pluck('id_kelas')->unique();
         $total_siswa = Siswa::whereIn('id_kelas', $kelas_ids)->count();
 
+        $kelas_hrt = null;
+        $jumlah_siswa_hrt = 0; // Tambahan variabel untuk menampung jumlah siswa
+        
+        if ($guru->is_hrt == 1 && $guru->id_kelas != null) {
+            $kelas_hrt = \App\Models\Kelas::find($guru->id_kelas);
+            if ($kelas_hrt) {
+                // Hitung jumlah siswa berdasarkan id_kelas wali tersebut
+                $jumlah_siswa_hrt = \App\Models\Siswa::where('id_kelas', $guru->id_kelas)->count();
+            }
+        }
+
         // --- LOGIKA PROGRESS & PENGINGAT ---
         $bulan_ini = Carbon::now()->month;
         $tahun_ini = Carbon::now()->year;
@@ -106,7 +117,9 @@ class DashboardController extends Controller
             'progress',
             'tunggakan_absen',
             'sudah_absen',
-            'total_wajib_absen'
+            'total_wajib_absen',
+            'kelas_hrt',
+            'jumlah_siswa_hrt' 
         ));
     }
 }
