@@ -70,7 +70,6 @@
 
         <aside class="w-72 bg-gradient-to-b from-blue-900 to-blue-950 border-r border-blue-800 min-h-screen fixed left-0 top-0 hidden md:flex flex-col z-30 shadow-xl transition-all duration-300 text-white">
 
-            {{-- HEADER / LOGO --}}
             <div class="h-20 flex items-center px-8 border-b border-white/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
                     <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-blue-600 border border-white/20 text-white shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform duration-200">
@@ -83,7 +82,6 @@
                 </a>
             </div>
 
-            {{-- NAVIGATION MENU --}}
             <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto custom-scrollbar">
 
                 <div class="px-4 mb-4">
@@ -138,14 +136,12 @@
                     <span class="text-sm">Rekap Kehadiran</span>
                 </a>
 
-                {{-- MENU BARU: HRT Time --}}
                 @php
                 // Mengecek apakah user adalah guru dan memiliki is_hrt yang valid (tidak null/0)
                 $isHrt = Auth::user()?->guru?->is_hrt;
                 @endphp
 
                 @if($isHrt)
-                {{-- Tampilan jika Guru adalah HRT --}}
                 <a href="#"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('hrt.time*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-blue-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('hrt.time*'))
@@ -157,15 +153,13 @@
                     <span class="text-sm">HRT Time</span>
                 </a>
                 @else
-                {{-- Tampilan jika Guru BUKAN HRT (Disabled) --}}
-                <div class="flex items-center justify-between px-4 py-3.5 rounded-xl text-blue-100/30 opacity-60 cursor-not-allowed select-none" title="Menu ini khusus untuk Homeroom Teacher">
+                <div class="flex items-center justify-between px-4 py-3.5 rounded-xl text-blue-100/30 opacity-60 cursor-not-allowed select-none" title="Menu ini khusus untuk HRT">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="text-sm">HRT Time</span>
                     </div>
-                    {{-- Ikon Gembok Kecil --}}
                     <svg class="w-4 h-4 text-blue-100/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                     </svg>
@@ -173,7 +167,6 @@
                 @endif
             </nav>
 
-            {{-- FOOTER / USER PROFILE --}}
             <div class="p-4 border-t border-blue-800/50 bg-blue-950/20">
                 <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-blue-900/50 border border-blue-800 group hover:border-blue-700 hover:shadow-lg hover:bg-blue-900 transition-all duration-300">
                     <div class="flex items-center gap-3 min-w-0">
