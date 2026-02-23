@@ -11,10 +11,10 @@
     <div class="py-2">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-2 space-y-8">
 
-            <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                     <h3 class="text-2xl font-bold">Selamat Datang, {{ Auth::user()->guru->nama_guru ?? Auth::user()->name }}</h3>
-                    <p class="text-indigo-100 mt-1 text-sm opacity-90">
+                    <p class="text-primary-100 mt-1 text-sm opacity-90">
                         Ini adalah ringkasan aktivitas mengajar Anda bulan <strong>{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</strong>.
                     </p>
                 </div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 {{ isset($kelas_hrt) ? 'lg:grid-cols-3' : 'lg:grid-cols-4' }} gap-6">
 
                 @if(isset($kelas_hrt))
                 <div class="bg-white p-6 rounded-2xl border border-amber-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
@@ -33,14 +33,12 @@
 
                     <div class="flex items-center gap-4 relative z-10">
                         <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                             </svg>
                         </div>
                         <div>
-                            <span class="badge-gibs">
-                                <p class="text-sm font-medium text-gray-500 fas fa-star">HRT Kelas <strong class="text-amber-600">{{ $kelas_hrt->nama_kelas }}</strong></p>
-                            </span>
+                            <p class="text-sm font-medium text-gray-500">HRT Kelas <strong class="text-amber-600">{{ $kelas_hrt->nama_kelas }}</strong></p>
                             <h4 class="text-2xl font-bold text-gray-900">{{ $jumlah_siswa_hrt }} <span class="text-sm font-normal text-gray-400">Siswa</span></h4>
                         </div>
                     </div>
@@ -93,13 +91,13 @@
                     <div class="flex items-center justify-between relative z-10">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Progress Absensi</p>
-                            <h4 class="text-2xl font-bold text-indigo-600">{{ $progress ?? 0 }}%</h4>
+                            <h4 class="text-2xl font-bold text-primary-600">{{ $progress ?? 0 }}%</h4>
                             <p class="text-[10px] text-gray-400 mt-1">Bulan {{ \Carbon\Carbon::now()->translatedFormat('F') }}</p>
                         </div>
                         <div class="relative w-12 h-12">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                 <path class="text-gray-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
-                                <path class="{{ $progress >= 100 ? 'text-emerald-500' : ($progress >= 50 ? 'text-indigo-500' : 'text-red-500') }}"
+                                <path class="{{ $progress >= 100 ? 'text-emerald-500' : ($progress >= 50 ? 'text-primary-500' : 'text-red-500') }}"
                                     stroke-dasharray="{{ $progress }}, 100"
                                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                     fill="none" stroke="currentColor" stroke-width="4" />
@@ -107,7 +105,7 @@
                         </div>
                     </div>
                     <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-100">
-                        <div class="h-full {{ $progress >= 100 ? 'bg-emerald-500' : 'bg-indigo-500' }}" style="width: {{ $progress }}%"></div>
+                        <div class="h-full {{ $progress >= 100 ? 'bg-emerald-500' : 'bg-primary-500' }}" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
 
@@ -158,7 +156,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-gray-600">{{ $t['mapel'] }}</td>
                                         <td class="px-6 py-4 text-right">
-                                            <a href="{{ $t['link'] }}" class="text-indigo-600 hover:text-indigo-900 font-medium text-xs border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
+                                            <a href="{{ $t['link'] }}" class="text-primary-600 hover:text-primary-900 font-medium text-xs border border-primary-200 px-3 py-1.5 rounded-lg hover:bg-primary-50 transition-colors">
                                                 Input Sekarang &rarr;
                                             </a>
                                         </td>
@@ -192,14 +190,14 @@
                                     <span class="font-bold text-gray-900">{{ $sudah_absen ?? 0 }} / {{ $total_wajib_absen ?? 0 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-100 rounded-full h-2.5">
-                                    <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000" style="width: {{ $progress }}%"></div>
+                                    <div class="bg-primary-600 h-2.5 rounded-full transition-all duration-1000" style="width: {{ $progress }}%"></div>
                                 </div>
                             </div>
 
                             <div class="pt-6 border-t border-gray-100">
                                 <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Aksi Cepat</h4>
                                 <div class="space-y-2">
-                                    <a href="{{ route('absensi.create') }}" class="block w-full text-center py-2.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-bold hover:bg-indigo-100 transition-colors">
+                                    <a href="{{ route('absensi.create') }}" class="block w-full text-center py-2.5 rounded-xl bg-secondary-50 text-secondary-700 text-sm font-bold hover:bg-secondary-100 border border-secondary-200 transition-colors">
                                         + Input Absensi
                                     </a>
                                     <a href="{{ route('absensi.index') }}" class="block w-full text-center py-2.5 rounded-xl border border-gray-200 text-gray-600 text-sm font-bold hover:bg-gray-50 transition-colors">
