@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Absensi\AbsensiController;
-use App\Http\Controllers\Absensi\DashboardController; // Tambahkan ini
+use App\Http\Controllers\Absensi\DashboardController;
+use App\Http\Controllers\Absensi\HrtTimeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/absensi/show/{id_kelas}/{id_mapel}', [App\Http\Controllers\Absensi\AbsensiController::class, 'show'])->name('absensi.show');
     Route::get('/absensi/detail/{id_kelas}/{id_mapel}', [App\Http\Controllers\Absensi\AbsensiController::class, 'detail'])->name('absensi.detail');
 
+    Route::get('/hrt-time', [HrtTimeController::class, 'index'])->name('hrt.time.index');
     // Group Absensi
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiController::class, 'index'])->name('index');

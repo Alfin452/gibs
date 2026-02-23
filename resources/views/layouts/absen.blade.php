@@ -142,7 +142,7 @@
                 @endphp
 
                 @if($isHrt)
-                <a href="#"
+                <a href="{{ route('hrt.time.index') }}"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('hrt.time*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-blue-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('hrt.time*'))
                     <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-cyan-400 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"></div>
