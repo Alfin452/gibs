@@ -77,7 +77,7 @@
                     </div>
                     <div class="flex flex-col">
                         <span class="text-lg font-extrabold text-white tracking-tight leading-none group-hover:text-secondary-300 transition-colors">PORTAL</span>
-                        <span class="text-xs font-bold text-primary-300 tracking-[0.2em] leading-none mt-1">ABSENSI</span>
+                        <span class="text-xs font-bold text-primary-300 tracking-[0.2em] leading-none mt-1">PRESENSI</span>
                     </div>
                 </a>
             </div>

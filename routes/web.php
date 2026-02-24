@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/absensi/detail/{id_kelas}/{id_mapel}', [App\Http\Controllers\Absensi\AbsensiController::class, 'detail'])->name('absensi.detail');
 
     Route::get('/hrt-time', [HrtTimeController::class, 'index'])->name('hrt.time.index');
+    Route::get('/hrt-time', [HrtTimeController::class, 'index'])->name('hrt.time.index');
+    Route::post('/hrt-time/import', [HrtTimeController::class, 'importExcel'])->name('hrt.time.import'); // Route baru
     // Group Absensi
     Route::prefix('absensi')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiController::class, 'index'])->name('index');
