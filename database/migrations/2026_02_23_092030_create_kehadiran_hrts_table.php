@@ -20,8 +20,7 @@ return new class extends Migration
             $table->integer('id_tahun_ajar');
 
             $table->date('tanggal');
-            $table->enum('status', ['H', 'S', 'I', 'A'])->default('H')->comment('H=Hadir, S=Sakit, I=Izin, A=Alpha');
-            $table->string('keterangan', 255)->nullable()->comment('Alasan jika sakit/izin');
+            $table->enum('status', ['H', 'S', 'I', 'A', 'L'])->default('H')->comment('H=Hadir, S=Sakit, I=Izin, A=Alpha, L=Libur');            $table->string('keterangan', 255)->nullable()->comment('Alasan jika sakit/izin');
             $table->timestamps();
 
             $table->foreign('id_siswa')->references('id_siswa')->on('siswa')->onDelete('cascade');

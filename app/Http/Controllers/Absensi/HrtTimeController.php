@@ -55,6 +55,59 @@ class HrtTimeController extends Controller
         return view('absensi.hrt_time.index', compact('guru', 'id_kelas', 'bulan', 'tahun', 'dates', 'siswa', 'kehadiran'));
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'bulan' => 'required',
+            'tahun' => 'required',
+            'absen' => 'nullable|array',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user->guru || !$user->guru->is_hrt) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak! Menu ini khusus untuk Homeroom Teacher.');
+        }
+
+        $id_kelas = $user->guru->id_kelas;
+        $id_guru = $user->guru->id_guru;
+
+        $tahunAjar = TahunAjar::where('status', 'Aktif')->first();
+        $id_tahun_ajar = $tahunAjar ? $tahunAjar->id_tahun_ajar : null;
+
+        $absenData = $request->input('absen', []);
+
+        foreach ($absenData as $id_siswa => $dates) {
+            foreach ($dates as $tanggal => $status) {
+                // Jika input tidak kosong, simpan/update ke database
+                if (!empty($status)) {
+                    KehadiranHrt::updateOrCreate(
+                        [
+                            'id_siswa' => $id_siswa,
+                            'tanggal' => $tanggal,
+                            'id_kelas' => $id_kelas,
+                        ],
+                        [
+                            'id_guru' => $id_guru,
+                            'id_tahun_ajar' => $id_tahun_ajar,
+                            'status' => strtoupper($status),
+                            'keterangan' => 'Manual Input'
+                        ]
+                    );
+                } else {
+                    // Jika input dikosongkan (dihapus user), hapus data kehadiran dari DB
+                    KehadiranHrt::where('id_siswa', $id_siswa)
+                        ->where('tanggal', $tanggal)
+                        ->where('id_kelas', $id_kelas)
+                        ->delete();
+                }
+            }
+        }
+
+        return redirect()->route('hrt.time.index', ['bulan' => $request->bulan, 'tahun' => $request->tahun])
+            ->with('success', 'Data kehadiran berhasil disimpan!');
+    }
+
     public function importExcel(Request $request)
     {
         $request->validate([

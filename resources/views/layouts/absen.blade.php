@@ -72,8 +72,15 @@
 
             <div class="h-20 flex items-center px-8 border-b border-white/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
-                    <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-primary-600 border border-white/20 text-white shadow-lg shadow-primary-500/30 group-hover:scale-105 transition-transform duration-200">
-                        <span class="text-xl font-bold font-sans">G</span>
+                    {{-- LOGO CONTAINER DESKTOP --}}
+                    <div class="relative w-12 h-12 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-xl blur opacity-40 group-hover:opacity-80 group-hover:blur-md transition-all duration-500"></div>
+                        <div class="relative w-full h-full bg-black border border-white/10 rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-300">
+                            <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none"></div>
+                            <img src="{{ asset('images/logo-gibs.png') }}"
+                                alt="Logo GIBS"
+                                class="relative z-10 w-full h-full object-cover">
+                        </div>
                     </div>
                     <div class="flex flex-col">
                         <span class="text-lg font-extrabold text-white tracking-tight leading-none group-hover:text-secondary-300 transition-colors">PORTAL</span>
@@ -198,8 +205,17 @@
         <main class="flex-1 md:ml-72 min-h-screen flex flex-col transition-all duration-300 w-full">
 
             <div class="md:hidden h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sticky top-0 z-30">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md">G</div>
+                <div class="flex items-center gap-2 group">
+                    {{-- LOGO CONTAINER MOBILE --}}
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-lg blur opacity-40 group-hover:opacity-80 transition-all duration-500"></div>
+                        <div class="relative w-full h-full bg-black border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none"></div>
+                            <img src="{{ asset('images/logo-gibs.png') }}"
+                                alt="Logo GIBS"
+                                class="relative z-10 w-full h-full object-cover">
+                        </div>
+                    </div>
                     <span class="font-bold text-lg text-gray-900 tracking-tight">PORTAL ABSENSI</span>
                 </div>
                 <button onclick="toggleSidebar()" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition-colors focus:outline-none">
@@ -230,7 +246,6 @@
                     </p>
                 </div>
             </footer>
-
         </main>
     </div>
 
