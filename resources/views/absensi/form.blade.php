@@ -5,7 +5,7 @@
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                {{ __('Lembar Absensi Siswa') }}
+                {{ __('Lembar Presensi Siswa') }}
             </h2>
             <div class="flex flex-wrap items-center gap-3 text-sm text-right">
 
@@ -80,8 +80,23 @@
                             @foreach($siswa as $index => $s)
 
                             @php
-                            $statusDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->status ?? 'H') : 'H';
-                            $ketDB = isset($dataKehadiran) ? ($dataKehadiran[$s->id_siswa]->keterangan ?? '') : '';
+                            // Cek apakah siswa ini terdaftar di data klinik hari ini dan statusnya MASIH SAKIT
+                            $is_sakit_klinik = isset($siswa_masih_sakit) && $siswa_masih_sakit->has($s->id_siswa);
+
+                            if (isset($dataKehadiran) && isset($dataKehadiran[$s->id_siswa])) {
+                            // MODE EDIT
+                            $statusDB = $dataKehadiran[$s->id_siswa]->status;
+                            $ketDB = $dataKehadiran[$s->id_siswa]->keterangan;
+                            } else {
+                            // FORM BARU
+                            if ($is_sakit_klinik) {
+                            $statusDB = 'S'; // Otomatis diset Sakit
+                            $ketDB = $siswa_masih_sakit[$s->id_siswa]->keterangan; // Keluhan otomatis
+                            } else {
+                            $statusDB = 'H'; // Default Hadir (Termasuk untuk yang sudah sembuh)
+                            $ketDB = '';
+                            }
+                            }
                             @endphp
 
                             <tr class="hover:bg-primary-50/30 transition-colors group">
@@ -150,7 +165,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                         </svg>
-                        Simpan Absensi
+                        Simpan Presensi
                     </button>
                 </div>
             </div>
@@ -204,4 +219,58 @@
             }
         });
     </script>
+
+    @if(isset($siswa_masih_sakit) && $siswa_masih_sakit->count() > 0)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let pesanHtml = "";
+            let showAlert = false;
+
+            // 1. Data Siswa Masih Sakit
+            @if(isset($siswa_masih_sakit) && $siswa_masih_sakit->count() > 0)
+            showAlert = true;
+            pesanHtml += "<div class='text-left mb-4'>";
+            pesanHtml += "<p class='font-bold text-red-600 mb-2'> Masih Sakit:</p>";
+            pesanHtml += "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
+            @foreach($siswa_masih_sakit as $sakit)
+            @php
+            $dataSiswa = $siswa->firstWhere('id_siswa', $sakit->id_siswa);
+            $namaSiswa = $dataSiswa ? $dataSiswa->nama_siswa : 'Siswa Tidak Ditemukan';
+            @endphp
+            pesanHtml += "<li><b>{{ $namaSiswa }}</b>: Sakit hari ke-<b>{{ $sakit->durasi_hari }}</b> <br><span class='text-xs text-gray-500'>({{ $sakit->keterangan }})</span></li>";
+            @endforeach
+            pesanHtml += "</ul></div>";
+            @endif
+
+            // 2. Data Siswa Baru Sembuh Hari Ini
+            @if(isset($siswa_baru_sembuh) && $siswa_baru_sembuh->count() > 0)
+            showAlert = true;
+            pesanHtml += "<div class='text-left mb-4'>";
+            pesanHtml += "<p class='font-bold text-green-600 mb-2'>✅ Sudah Kembali ke Kelas (Hari Ini):</p>";
+            pesanHtml += "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
+            @foreach($siswa_baru_sembuh as $sembuh)
+            @php
+            $dataSiswa = $siswa->firstWhere('id_siswa', $sembuh->id_siswa);
+            $namaSiswa = $dataSiswa ? $dataSiswa->nama_siswa : 'Siswa Tidak Ditemukan';
+            @endphp
+            pesanHtml += "<li><b>{{ $namaSiswa }}</b> <br><span class='text-xs text-green-700'>(Dikonfirmasi hadir oleh: <b>{{ $sembuh->nama_guru }}</b> pada Mapel {{ $sembuh->nama_mapel }})</span></li>";
+            @endforeach
+            pesanHtml += "</ul></div>";
+            @endif
+
+            // Jika ada data (sakit atau sembuh), tampilkan Pop-up
+            if (showAlert) {
+                pesanHtml += "<div class='mt-4 p-3 bg-blue-50 rounded text-xs text-blue-700 text-left border border-blue-100'><b>Info:</b> Jika siswa yang 'Masih Sakit' ternyata ada di kelas, silakan ubah absensinya menjadi <b>Hadir (H)</b> agar otomatis dinyatakan sembuh.</div>";
+
+                Swal.fire({
+                    title: 'Informasi Medis Siswa',
+                    html: pesanHtml,
+                    icon: 'info',
+                    confirmButtonColor: '#3ab09e',
+                    confirmButtonText: 'Baik, Mengerti'
+                });
+            }
+        });
+    </script>
+    @endif
 </x-absen-layout>

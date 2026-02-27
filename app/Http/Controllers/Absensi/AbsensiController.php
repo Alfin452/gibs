@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Absensi;
 
-use App\Http\Controllers\Controller; 
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\KehadiranHarian;
@@ -116,10 +116,8 @@ class AbsensiController extends Controller
         }
 
         // 2. Pecah string value menjadi ID terpisah
-        // Format value di view: "id_kelas-id_mapel"
         $ids = explode('-', $request->kombinasi_jadwal);
 
-        // Pastikan hasil explode valid
         if (count($ids) !== 2) {
             return back()->with('error', 'Format jadwal tidak valid.');
         }
@@ -143,10 +141,58 @@ class AbsensiController extends Controller
             ->orderBy('nama_siswa', 'asc')
             ->get();
 
+        // INI VARIABEL YANG HILANG SEBELUMNYA
         $infoKelas = Kelas::find($id_kelas);
         $infoMapel = Mapel::find($id_mapel);
 
-        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel'));
+        $tanggal_absen = Carbon::parse($tanggal)->startOfDay();
+
+        // 1. Siswa yang MASIH SAKIT (Belum ada yang meng-absen H)
+        $siswa_masih_sakit_db = DB::table('sakit_siswa')
+            ->where('status_akhir', 'Masih Sakit')
+            ->where('tanggal', '<=', $tanggal)
+            ->get();
+
+        $siswa_masih_sakit = collect();
+        foreach ($siswa_masih_sakit_db as $sakit) {
+            $tgl_mulai = Carbon::parse($sakit->tanggal)->startOfDay();
+            $hari_sakit = 0;
+            for ($date = $tgl_mulai->copy(); $date->lte($tanggal_absen); $date->addDay()) {
+                if (!$date->isSunday()) $hari_sakit++;
+            }
+            $sakit->durasi_hari = $hari_sakit;
+            $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
+        }
+
+        // 2. Siswa yang BARU SEMBUH HARI INI (Sudah dikonfirmasi Hadir oleh guru lain)
+        $siswa_baru_sembuh_db = DB::table('sakit_siswa')
+            ->where('status_akhir', 'Kembali ke Kelas')
+            ->whereDate('updated_at', Carbon::parse($tanggal)->toDateString()) // Sembuh pada hari absen ini
+            ->get();
+
+        $siswa_baru_sembuh = collect();
+        foreach ($siswa_baru_sembuh_db as $sembuh) {
+            // Cari siapa guru yang PERTAMA KALI mengabsen 'H' di hari ini
+            $konfirmasi = DB::table('kehadiran_harian')
+                ->join('guru', 'kehadiran_harian.id_guru', '=', 'guru.id_guru')
+                ->join('mapel', 'kehadiran_harian.id_mapel', '=', 'mapel.id_mapel')
+                ->where('kehadiran_harian.id_siswa', $sembuh->id_siswa)
+                ->where('kehadiran_harian.tanggal', $tanggal)
+                ->where('kehadiran_harian.status', 'H')
+                ->orderBy('kehadiran_harian.updated_at', 'asc') // Cari yang paling awal
+                ->select('guru.nama_guru', 'mapel.nama_mapel')
+                ->first();
+
+            if ($konfirmasi) {
+                $sembuh->nama_guru = $konfirmasi->nama_guru;
+                $sembuh->nama_mapel = $konfirmasi->nama_mapel;
+                $siswa_baru_sembuh->put($sembuh->id_siswa, $sembuh);
+            }
+        }
+
+        // Pastikan variabel yang di-compact disesuaikan
+        // (Di method edit tambahkan 'dataKehadiran' di dalam compact-nya)
+        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'siswa_masih_sakit', 'siswa_baru_sembuh'));
     }
 
     public function store(Request $request)
@@ -196,6 +242,17 @@ class AbsensiController extends Controller
                 );
 
                 $this->updateRekapBulanan($id_siswa, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
+
+                if ($status_kode === 'H') {
+                    DB::table('sakit_siswa')
+                        ->where('id_siswa', $id_siswa)
+                        ->where('status_akhir', 'Masih Sakit') // Pastikan hanya merubah yang sedang sakit
+                        ->update([
+                            'status_akhir' => 'Kembali ke Kelas',
+                            'waktu_keluar' => now()->format('H:i:s'), // Catat jam dia kembali
+                            'updated_at' => now()
+                        ]);
+                }
             }
 
             DB::commit();
@@ -222,7 +279,54 @@ class AbsensiController extends Controller
             ->get()
             ->keyBy('id_siswa');
 
-        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'dataKehadiran'));
+        $tanggal_absen = Carbon::parse($tanggal)->startOfDay();
+
+        // 1. Siswa yang MASIH SAKIT (Belum ada yang meng-absen H)
+        $siswa_masih_sakit_db = DB::table('sakit_siswa')
+            ->where('status_akhir', 'Masih Sakit')
+            ->where('tanggal', '<=', $tanggal)
+            ->get();
+
+        $siswa_masih_sakit = collect();
+        foreach ($siswa_masih_sakit_db as $sakit) {
+            $tgl_mulai = Carbon::parse($sakit->tanggal)->startOfDay();
+            $hari_sakit = 0;
+            for ($date = $tgl_mulai->copy(); $date->lte($tanggal_absen); $date->addDay()) {
+                if (!$date->isSunday()) $hari_sakit++;
+            }
+            $sakit->durasi_hari = $hari_sakit;
+            $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
+        }
+
+        // 2. Siswa yang BARU SEMBUH HARI INI (Sudah dikonfirmasi Hadir oleh guru lain)
+        $siswa_baru_sembuh_db = DB::table('sakit_siswa')
+            ->where('status_akhir', 'Kembali ke Kelas')
+            ->whereDate('updated_at', Carbon::parse($tanggal)->toDateString()) // Sembuh pada hari absen ini
+            ->get();
+
+        $siswa_baru_sembuh = collect();
+        foreach ($siswa_baru_sembuh_db as $sembuh) {
+            // Cari siapa guru yang PERTAMA KALI mengabsen 'H' di hari ini
+            $konfirmasi = DB::table('kehadiran_harian')
+                ->join('guru', 'kehadiran_harian.id_guru', '=', 'guru.id_guru')
+                ->join('mapel', 'kehadiran_harian.id_mapel', '=', 'mapel.id_mapel')
+                ->where('kehadiran_harian.id_siswa', $sembuh->id_siswa)
+                ->where('kehadiran_harian.tanggal', $tanggal)
+                ->where('kehadiran_harian.status', 'H')
+                ->orderBy('kehadiran_harian.updated_at', 'asc') // Cari yang paling awal
+                ->select('guru.nama_guru', 'mapel.nama_mapel')
+                ->first();
+
+            if ($konfirmasi) {
+                $sembuh->nama_guru = $konfirmasi->nama_guru;
+                $sembuh->nama_mapel = $konfirmasi->nama_mapel;
+                $siswa_baru_sembuh->put($sembuh->id_siswa, $sembuh);
+            }
+        }
+
+        // Pastikan variabel yang di-compact disesuaikan
+        // (Di method edit tambahkan 'dataKehadiran' di dalam compact-nya)
+        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'siswa_masih_sakit', 'siswa_baru_sembuh'));
     }
 
     private function updateRekapBulanan($id_siswa, $id_mapel, $id_kelas, $id_tahun_ajar, $tanggal, $id_guru)
