@@ -190,7 +190,7 @@
 
                     Swal.fire({
                         title: 'Konfirmasi Simpan',
-                        text: "Apakah Anda yakin data absensi siswa sudah benar?",
+                        text: "Apakah Anda yakin data presensi siswa sudah benar?",
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#3ab09e', // Warna Primary (Keppel)

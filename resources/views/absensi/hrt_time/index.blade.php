@@ -602,5 +602,29 @@
                 timer: 2500
             });
         });
+
+        // ============================================
+        // KONFIRMASI SIMPAN KEHADIRAN (SWEETALERT2)
+        // ============================================
+        document.getElementById('form-absensi').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah form langsung tersubmit
+
+            Swal.fire({
+                title: 'Konfirmasi Simpan',
+                text: 'Apakah Anda yakin data kehadiran yang diinputkan sudah benar?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#059669', // Warna emerald/hijau sesuai dengan tombol simpan
+                cancelButtonColor: '#6B7280', // Warna abu-abu untuk batal
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika user klik "Ya, Simpan!", lanjutkan submit form
+                    this.submit();
+                }
+            });
+        });
     </script>
 </x-absen-layout>
