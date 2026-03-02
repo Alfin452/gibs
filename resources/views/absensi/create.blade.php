@@ -132,102 +132,86 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <div class="lg:col-span-2 space-y-6">
-
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
-                                Pilih Periode
-                            </h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Bulan</label>
-                                    <select id="bulan" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
-                                        @foreach(range(1, 12) as $m)
-                                        <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
-                                            {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Tahun</label>
-                                    <select id="tahun" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
-                                        @php $cy = date('Y'); @endphp
-                                        <option value="{{ $cy }}">{{ $cy }}</option>
-                                        <option value="{{ $cy-1 }}">{{ $cy-1 }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 px-1">
-                                <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
-                                Pilih Kelas & Mapel
-                            </h3>
-
-                            @if(isset($kelompok_jadwal) && count($kelompok_jadwal) > 0)
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @foreach($kelompok_jadwal as $group)
-                                @php
-                                $jadwal_utama = $group->first();
-                                @endphp
-
-                                <div
-                                    class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-500 hover:shadow-md hover:ring-2 hover:ring-primary-500/20 rounded-xl p-5 transition-all duration-200 relative overflow-hidden"
-                                    onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $jadwal_utama->id_kelas }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $jadwal_utama->kelas->nama_kelas }}')">
-                                    <div class="absolute -right-6 -top-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12 pointer-events-none">
-                                        <svg class="w-32 h-32 text-primary-900" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M19 2H5c-1.103 0-2 .897-2 2v16c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM5 20V4h14l.002 16H5z"></path>
-                                            <path d="M7 6h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
-                                        </svg>
-                                    </div>
-
-                                    <div class="relative z-10">
-                                        <div class="mb-3">
-                                            <p class="text-xs font-bold text-primary-600 uppercase tracking-wide mb-1">
-                                                {{ $jadwal_utama->kelas->nama_kelas }}
-                                            </p>
-                                            <h4 class="text-lg font-bold text-gray-900 group-hover:text-secondary-600 transition-colors leading-snug">
-                                                {{ $jadwal_utama->mapel->nama_mapel }}
-                                            </h4>
-                                        </div>
-
-                                        <div class="h-px bg-gray-100 w-full mb-3"></div>
-
-                                        <div class="space-y-2">
-                                            @foreach($group as $slot)
-                                            <div class="flex items-start gap-2 text-xs text-gray-500 group-hover:text-gray-600">
-                                                <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-
-                                                <div>
-                                                    <span class="font-bold text-gray-700">{{ $slot->hari }}</span>
-                                                    <span class="text-gray-400 mx-1">•</span>
-                                                    <span class="font-mono">
-                                                        {{ \Carbon\Carbon::parse($slot->jam_mulai)->format('H:i') }} -
-                                                        {{ \Carbon\Carbon::parse($slot->jam_selesai)->format('H:i') }}
-                                                    </span>
-                                                </div>
-                                            </div>
+                            <div class="mb-8">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
+                                    Pilih Periode
+                                </h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Bulan</label>
+                                        <select id="bulan" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
+                                            @foreach(range(1, 12) as $m)
+                                            <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
+                                            </option>
                                             @endforeach
-                                        </div>
+                                        </select>
                                     </div>
-
-                                    <div class="checkmark hidden absolute top-4 right-4 bg-primary-600 text-white rounded-full p-1 shadow-sm">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                        </svg>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Tahun</label>
+                                        <select id="tahun" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
+                                            @php $cy = date('Y'); @endphp
+                                            <option value="{{ $cy }}">{{ $cy }}</option>
+                                            <option value="{{ $cy-1 }}">{{ $cy-1 }}</option>
+                                        </select>
                                     </div>
                                 </div>
-                                @endforeach
                             </div>
-                            @else
-                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
-                                <p class="text-sm text-yellow-700">Anda belum memiliki jadwal mengajar.</p>
+
+                            <hr class="border-gray-100 mb-8">
+
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
+                                    Pilih Kelas & Mapel
+                                </h3>
+
+                                @if(isset($kelompok_jadwal) && count($kelompok_jadwal) > 0)
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    @foreach($kelompok_jadwal as $group)
+                                    @php $jadwal_utama = $group->first(); @endphp
+
+                                    <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-500 hover:shadow-md hover:ring-2 hover:ring-primary-500/20 rounded-xl p-5 transition-all duration-200 relative overflow-hidden"
+                                        onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $jadwal_utama->id_kelas }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $jadwal_utama->kelas->nama_kelas }}')">
+
+                                        <div class="relative z-10">
+                                            <div class="mb-3">
+                                                <p class="text-xs font-bold text-primary-600 uppercase tracking-wide mb-1">{{ $jadwal_utama->kelas->nama_kelas }}</p>
+                                                <h4 class="text-lg font-bold text-gray-900 group-hover:text-secondary-600 transition-colors leading-snug">{{ $jadwal_utama->mapel->nama_mapel }}</h4>
+                                            </div>
+                                            <div class="h-px bg-gray-100 w-full mb-3"></div>
+                                            <div class="space-y-2">
+                                                @foreach($group as $slot)
+                                                <div class="flex items-start gap-2 text-xs text-gray-500 group-hover:text-gray-600">
+                                                    <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <div>
+                                                        <span class="font-bold text-gray-700">{{ $slot->hari }}</span>
+                                                        <span class="text-gray-400 mx-1">•</span>
+                                                        <span class="font-mono">{{ \Carbon\Carbon::parse($slot->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->jam_selesai)->format('H:i') }}</span>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="checkmark hidden absolute top-4 right-4 bg-primary-600 text-white rounded-full p-1 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                @else
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                                    <p class="text-sm text-yellow-700">Anda belum memiliki jadwal mengajar.</p>
+                                </div>
+                                @endif
                             </div>
-                            @endif
                         </div>
                     </div>
 
