@@ -243,13 +243,13 @@ class AbsensiController extends Controller
 
                 $this->updateRekapBulanan($id_siswa, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
 
+                // PENYESUAIAN DISINI: Menghapus update waktu_keluar
                 if ($status_kode === 'H') {
                     DB::table('sakit_siswa')
                         ->where('id_siswa', $id_siswa)
                         ->where('status_akhir', 'Masih Sakit') // Pastikan hanya merubah yang sedang sakit
                         ->update([
                             'status_akhir' => 'Kembali ke Kelas',
-                            'waktu_keluar' => now()->format('H:i:s'), // Catat jam dia kembali
                             'updated_at' => now()
                         ]);
                 }
