@@ -224,47 +224,34 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let pesanHtml = "";
-            let showAlert = false;
+            let hasSakitInClass = false; // Flag untuk mengecek apakah ada siswa kelas ini yang sakit
 
-            // 1. Data Siswa Masih Sakit
-            @if(isset($siswa_masih_sakit) && $siswa_masih_sakit->count() > 0)
-            showAlert = true;
-            pesanHtml += "<div class='text-left mb-4'>";
-            pesanHtml += "<p class='font-bold text-red-600 mb-2'> Masih Sakit:</p>";
-            pesanHtml += "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
+            // Mulai membangun list
+            let listSakit = "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
+
             @foreach($siswa_masih_sakit as $sakit)
             @php
+            // Cari apakah siswa yang sakit ini ada dalam daftar $siswa di kelas ini
             $dataSiswa = $siswa->firstWhere('id_siswa', $sakit->id_siswa);
-            $namaSiswa = $dataSiswa ? $dataSiswa->nama_siswa : 'Siswa Tidak Ditemukan';
             @endphp
-            pesanHtml += "<li><b>{{ $namaSiswa }}</b>: Sakit hari ke-<b>{{ $sakit->durasi_hari }}</b> <br><span class='text-xs text-gray-500'>({{ $sakit->keterangan }})</span></li>";
-            @endforeach
-            pesanHtml += "</ul></div>";
+            @if($dataSiswa)
+            hasSakitInClass = true;
+            pesanHtml += "<li><b>{{ $dataSiswa->nama_siswa }}</b>: Sakit <br><span class='text-xs text-gray-500'>({{ $sakit->keterangan }})</span></li>";
             @endif
-
-            // 2. Data Siswa Baru Sembuh Hari Ini
-            @if(isset($siswa_baru_sembuh) && $siswa_baru_sembuh->count() > 0)
-            showAlert = true;
-            pesanHtml += "<div class='text-left mb-4'>";
-            pesanHtml += "<p class='font-bold text-green-600 mb-2'>✅ Sudah Kembali ke Kelas (Hari Ini):</p>";
-            pesanHtml += "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
-            @foreach($siswa_baru_sembuh as $sembuh)
-            @php
-            $dataSiswa = $siswa->firstWhere('id_siswa', $sembuh->id_siswa);
-            $namaSiswa = $dataSiswa ? $dataSiswa->nama_siswa : 'Siswa Tidak Ditemukan';
-            @endphp
-            pesanHtml += "<li><b>{{ $namaSiswa }}</b> <br><span class='text-xs text-green-700'>(Dikonfirmasi hadir oleh: <b>{{ $sembuh->nama_guru }}</b> pada Mapel {{ $sembuh->nama_mapel }})</span></li>";
             @endforeach
-            pesanHtml += "</ul></div>";
-            @endif
 
-            // Jika ada data (sakit atau sembuh), tampilkan Pop-up
-            if (showAlert) {
-                pesanHtml += "<div class='mt-4 p-3 bg-blue-50 rounded text-xs text-blue-700 text-left border border-blue-100'><b>Info:</b> Jika siswa yang 'Masih Sakit' ternyata ada di kelas, silakan ubah absensinya menjadi <b>Hadir (H)</b> agar otomatis dinyatakan sembuh.</div>";
+            // Jika ditemukan siswa kelas ini yang sakit, tampilkan SweetAlert
+            if (hasSakitInClass) {
+                let fullHtml = "<div class='text-left mb-4'>" +
+                    "<p class='font-bold text-red-600 mb-2'>Sedang Sakit:</p>" +
+                    "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>" +
+                    pesanHtml +
+                    "</ul></div>" 
+                    
 
                 Swal.fire({
                     title: 'Informasi Medis Siswa',
-                    html: pesanHtml,
+                    html: fullHtml,
                     icon: 'info',
                     confirmButtonColor: '#3ab09e',
                     confirmButtonText: 'Baik, Mengerti'
