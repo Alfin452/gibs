@@ -126,6 +126,9 @@ class AbsensiController extends Controller
         $id_mapel = $ids[1];
         $tanggal = $request->tanggal;
 
+        if (!$this->cekOtorisasiGuru($id_kelas, $id_mapel)) {
+            abort(403, 'Akses Ditolak: Anda tidak mengajar di kelas & mata pelajaran tersebut.');
+        }
         // 3. Logika pengecekan duplikasi
         $sudah_absen = KehadiranHarian::where('tanggal', $tanggal)
             ->where('id_kelas', $id_kelas)
@@ -197,13 +200,16 @@ class AbsensiController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi Input
         $request->validate([
             'tanggal' => 'required|date',
             'id_kelas' => 'required',
             'id_mapel' => 'required',
             'status'   => 'required|array',
         ]);
+
+        if (!$this->cekOtorisasiGuru($request->id_kelas, $request->id_mapel)) {
+            abort(403, 'Akses Ditolak: Percobaan manipulasi data terdeteksi.');
+        }
 
         $inputDate = Carbon::parse($request->tanggal)->startOfDay();
         $serverDate = Carbon::now()->startOfDay();
@@ -224,8 +230,10 @@ class AbsensiController extends Controller
         DB::beginTransaction();
 
         try {
-            foreach ($request->status as $id_siswa => $status_kode) {
+            $siswa_hadir_ids = [];
+            $all_siswa_ids = array_keys($request->status);
 
+            foreach ($request->status as $id_siswa => $status_kode) {
                 KehadiranHarian::updateOrCreate(
                     [
                         'tanggal'  => $request->tanggal,
@@ -241,19 +249,22 @@ class AbsensiController extends Controller
                     ]
                 );
 
-                $this->updateRekapBulanan($id_siswa, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
-
-                // PENYESUAIAN DISINI: Menghapus update waktu_keluar
                 if ($status_kode === 'H') {
-                    DB::table('sakit_siswa')
-                        ->where('id_siswa', $id_siswa)
-                        ->where('status_akhir', 'Masih Sakit') // Pastikan hanya merubah yang sedang sakit
-                        ->update([
-                            'status_akhir' => 'Kembali ke Kelas',
-                            'updated_at' => now()
-                        ]);
+                    $siswa_hadir_ids[] = $id_siswa;
                 }
             }
+
+            if (!empty($siswa_hadir_ids)) {
+                DB::table('sakit_siswa')
+                    ->whereIn('id_siswa', $siswa_hadir_ids)
+                    ->where('status_akhir', 'Masih Sakit')
+                    ->update([
+                        'status_akhir' => 'Kembali ke Kelas',
+                        'updated_at' => now()
+                    ]);
+            }
+
+            $this->updateRekapBulananMassal($all_siswa_ids, $request->id_mapel, $request->id_kelas, $id_tahun_ajar, $request->tanggal, $id_guru);
 
             DB::commit();
 
@@ -266,6 +277,10 @@ class AbsensiController extends Controller
 
     public function edit($id_kelas, $id_mapel, $tanggal)
     {
+        if (!$this->cekOtorisasiGuru($id_kelas, $id_mapel)) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki jadwal untuk mengedit absensi kelas ini.');
+        }
+
         $infoKelas = Kelas::find($id_kelas);
         $infoMapel = Mapel::find($id_mapel);
 
@@ -281,7 +296,6 @@ class AbsensiController extends Controller
 
         $tanggal_absen = Carbon::parse($tanggal)->startOfDay();
 
-        // 1. Siswa yang MASIH SAKIT (Belum ada yang meng-absen H)
         $siswa_masih_sakit_db = DB::table('sakit_siswa')
             ->where('status_akhir', 'Masih Sakit')
             ->where('tanggal', '<=', $tanggal)
@@ -298,7 +312,6 @@ class AbsensiController extends Controller
             $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
         }
 
-        // 2. Siswa yang BARU SEMBUH HARI INI (Sudah dikonfirmasi Hadir oleh guru lain)
         $siswa_baru_sembuh_db = DB::table('sakit_siswa')
             ->where('status_akhir', 'Kembali ke Kelas')
             ->whereDate('updated_at', Carbon::parse($tanggal)->toDateString()) // Sembuh pada hari absen ini
@@ -306,7 +319,6 @@ class AbsensiController extends Controller
 
         $siswa_baru_sembuh = collect();
         foreach ($siswa_baru_sembuh_db as $sembuh) {
-            // Cari siapa guru yang PERTAMA KALI mengabsen 'H' di hari ini
             $konfirmasi = DB::table('kehadiran_harian')
                 ->join('guru', 'kehadiran_harian.id_guru', '=', 'guru.id_guru')
                 ->join('mapel', 'kehadiran_harian.id_mapel', '=', 'mapel.id_mapel')
@@ -324,43 +336,50 @@ class AbsensiController extends Controller
             }
         }
 
-        // Pastikan variabel yang di-compact disesuaikan
-        // (Di method edit tambahkan 'dataKehadiran' di dalam compact-nya)
-        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'siswa_masih_sakit', 'siswa_baru_sembuh'));
+        return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'siswa_masih_sakit', 'siswa_baru_sembuh', 'dataKehadiran'));
     }
 
-    private function updateRekapBulanan($id_siswa, $id_mapel, $id_kelas, $id_tahun_ajar, $tanggal, $id_guru)
+    private function updateRekapBulananMassal($siswa_ids, $id_mapel, $id_kelas, $id_tahun_ajar, $tanggal, $id_guru)
     {
+        $bulan = date('m', strtotime($tanggal));
+        $tahun = date('Y', strtotime($tanggal));
         $periode = date('m-Y', strtotime($tanggal));
 
-        $stats = KehadiranHarian::where('id_siswa', $id_siswa)
+        $stats = KehadiranHarian::whereIn('id_siswa', $siswa_ids)
             ->where('id_mapel', $id_mapel)
-            ->whereRaw("DATE_FORMAT(tanggal, '%m-%Y') = ?", [$periode])
-            ->selectRaw("
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->selectRaw("id_siswa,
                 COUNT(CASE WHEN status = 'H' THEN 1 END) as total_hadir,
                 COUNT(CASE WHEN status = 'S' THEN 1 END) as total_sakit,
                 COUNT(CASE WHEN status = 'I' THEN 1 END) as total_izin,
                 COUNT(CASE WHEN status = 'A' THEN 1 END) as total_alpha
             ")
-            ->first();
+            ->groupBy('id_siswa')
+            ->get()
+            ->keyBy('id_siswa'); 
 
-        DB::table('kehadiran_bulanan')->updateOrInsert(
-            [
-                'id_siswa' => $id_siswa,
-                'id_mapel' => $id_mapel,
-                'periode'  => $periode
-            ],
-            [
-                'id_kelas'         => $id_kelas,
-                'id_tahun_ajar'    => $id_tahun_ajar,
-                'hadir'            => $stats->total_hadir,
-                'sakit'            => $stats->total_sakit,
-                'izin'             => $stats->total_izin,
-                'tanpa_keterangan' => $stats->total_alpha,
-                'id_guru'          => $id_guru, // Update penanggung jawab bulan ini
-                'is_lock'          => 0
-            ]
-        );
+        foreach ($siswa_ids as $id_siswa) {
+            $statSiswa = $stats->get($id_siswa);
+
+            DB::table('kehadiran_bulanan')->updateOrInsert(
+                [
+                    'id_siswa' => $id_siswa,
+                    'id_mapel' => $id_mapel,
+                    'periode'  => $periode
+                ],
+                [
+                    'id_kelas'         => $id_kelas,
+                    'id_tahun_ajar'    => $id_tahun_ajar,
+                    'hadir'            => $statSiswa ? $statSiswa->total_hadir : 0,
+                    'sakit'            => $statSiswa ? $statSiswa->total_sakit : 0,
+                    'izin'             => $statSiswa ? $statSiswa->total_izin : 0,
+                    'tanpa_keterangan' => $statSiswa ? $statSiswa->total_alpha : 0,
+                    'id_guru'          => $id_guru,
+                    'is_lock'          => 0
+                ]
+            );
+        }
     }
 
     public function laporan()
@@ -473,6 +492,20 @@ class AbsensiController extends Controller
         $list_tanggal = [];
         $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
 
+       
+        $start_date = date('Y-m-d', mktime(0, 0, 0, $bulan, 1, $tahun));
+        $end_date = date('Y-m-d', mktime(0, 0, 0, $bulan, $jumlah_hari, $tahun));
+
+        $data_absen = KehadiranHarian::where('id_kelas', $id_kelas)
+            ->where('id_mapel', $id_mapel)
+            ->whereBetween('tanggal', [$start_date, $end_date])
+            ->pluck('tanggal') // Hanya tarik kolom tanggal
+            ->toArray();
+
+        $sudah_absen_array = array_map(function ($tgl) {
+            return date('Y-m-d', strtotime($tgl));
+        }, $data_absen);
+
         for ($d = 1; $d <= $jumlah_hari; $d++) {
             $time = mktime(0, 0, 0, $bulan, $d, $tahun);
             $date = date('Y-m-d', $time);
@@ -491,10 +524,8 @@ class AbsensiController extends Controller
 
             if (in_array($hari_indo, $jadwal_hari)) {
 
-                $sudah_absen = KehadiranHarian::where('tanggal', $date)
-                    ->where('id_kelas', $id_kelas)
-                    ->where('id_mapel', $id_mapel)
-                    ->exists();
+            
+                $sudah_absen = in_array($date, $sudah_absen_array);
 
                 $list_tanggal[] = [
                     'tanggal' => $date,
@@ -548,40 +579,44 @@ class AbsensiController extends Controller
 
     public function show(Request $request, $id_kelas, $id_mapel)
     {
+        if (!$this->cekOtorisasiGuru($id_kelas, $id_mapel)) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk melihat data kelas ini.');
+        }
+        
         $guru = Auth::user()->guru;
 
-        $kelas = \App\Models\Kelas::findOrFail($id_kelas);
-        $mapel = \App\Models\Mapel::findOrFail($id_mapel);
+        $kelas = Kelas::findOrFail($id_kelas);
+        $mapel = Mapel::findOrFail($id_mapel);
 
-        // Filter Search
-        $query = \App\Models\Siswa::where('id_kelas', $id_kelas);
+        // 1. Ambil data Siswa sesuai filter search
+        $query = Siswa::where('id_kelas', $id_kelas);
         if ($request->filled('search')) {
             $query->where('nama_siswa', 'like', '%' . $request->search . '%');
         }
         $siswa = $query->orderBy('nama_siswa', 'asc')->get();
 
+        $semuaAbsen = KehadiranHarian::where('id_kelas', $id_kelas)
+            ->where('id_mapel', $id_mapel)
+            ->where('id_guru', $guru->id_guru)
+            ->select('id_siswa', 'tanggal', 'status', 'keterangan') // Ambil kolom yang butuh saja
+            ->get();
+
+        $absenGrouped = $semuaAbsen->groupBy('id_siswa');
+
         foreach ($siswa as $s) {
-            // Query Base
-            $queryAbsen = \App\Models\KehadiranHarian::where('id_siswa', $s->id_siswa)
-                ->where('id_kelas', $id_kelas)
-                ->where('id_mapel', $id_mapel)
-                ->where('id_guru', $guru->id_guru);
+            $absenSiswa = $absenGrouped->get($s->id_siswa, collect());
 
-            // 1. Hitung Statistik
-            $s->total_hadir = (clone $queryAbsen)->where('status', 'H')->count();
-            $s->total_sakit = (clone $queryAbsen)->where('status', 'S')->count();
-            $s->total_izin  = (clone $queryAbsen)->where('status', 'I')->count();
-            $s->total_alpha = (clone $queryAbsen)->where('status', 'A')->count();
+            $s->total_hadir = $absenSiswa->where('status', 'H')->count();
+            $s->total_sakit = $absenSiswa->where('status', 'S')->count();
+            $s->total_izin  = $absenSiswa->where('status', 'I')->count();
+            $s->total_alpha = $absenSiswa->where('status', 'A')->count();
 
-            // 2. Ambil List Keterangan (Hanya yang ada isinya)
-            $s->list_keterangan = (clone $queryAbsen)
-                ->whereNotNull('keterangan')
-                ->where('keterangan', '!=', '')
-                ->orderBy('tanggal', 'desc')
-                ->get(['tanggal', 'status', 'keterangan']); // Ambil kolom penting saja
+            $s->list_keterangan = $absenSiswa->filter(function ($item) {
+                return !is_null($item->keterangan) && trim($item->keterangan) !== '';
+            })
+                ->sortByDesc('tanggal')
+                ->values(); // Reset index array
 
-            // 3. Rumus Persentase (Logika Awal: Hadir Fisik)
-            // Pembagi = H + S + I + A (Total data yang masuk)
             $total_data = $s->total_hadir + $s->total_sakit + $s->total_izin + $s->total_alpha;
 
             $s->persentase = $total_data > 0
@@ -590,5 +625,18 @@ class AbsensiController extends Controller
         }
 
         return view('absensi.show', compact('kelas', 'mapel', 'siswa'));
+    }
+
+    private function cekOtorisasiGuru($id_kelas, $id_mapel)
+    {
+        $guru = Auth::user()->guru;
+
+        if (!$guru) return false;
+
+        // Cek ke database apakah ada jadwal untuk guru ini dengan kelas & mapel yang diminta
+        return \App\Models\Jadwal::where('id_guru', $guru->id_guru)
+            ->where('id_kelas', $id_kelas)
+            ->where('id_mapel', $id_mapel)
+            ->exists();
     }
 }
