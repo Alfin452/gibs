@@ -14,7 +14,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Force Bahasa Indonesia untuk manipulasi tanggal di Controller ini
         Carbon::setLocale('id');
 
         $user = Auth::user();
@@ -27,7 +26,7 @@ class DashboardController extends Controller
                 'total_kelas' => 0,
                 'total_mapel' => 0,
                 'progress' => 0,
-                'tunggakan_absen' => [], // Fix variabel name agar konsisten
+                'tunggakan_absen' => [],
                 'sudah_absen' => 0,
                 'total_wajib_absen' => 0
             ]);
@@ -44,22 +43,38 @@ class DashboardController extends Controller
         $total_siswa = Siswa::whereIn('id_kelas', $kelas_ids)->count();
 
         $kelas_hrt = null;
-        $jumlah_siswa_hrt = 0; // Tambahan variabel untuk menampung jumlah siswa
-        
+        $jumlah_siswa_hrt = 0;
+
         if ($guru->is_hrt == 1 && $guru->id_kelas != null) {
             $kelas_hrt = \App\Models\Kelas::find($guru->id_kelas);
             if ($kelas_hrt) {
-                // Hitung jumlah siswa berdasarkan id_kelas wali tersebut
-                $jumlah_siswa_hrt = \App\Models\Siswa::where('id_kelas', $guru->id_kelas)->count();
+                $jumlah_siswa_hrt = Siswa::where('id_kelas', $guru->id_kelas)->count();
             }
         }
 
-        // --- LOGIKA PROGRESS & PENGINGAT ---
         $bulan_ini = Carbon::now()->month;
         $tahun_ini = Carbon::now()->year;
 
         $start_date = Carbon::createFromDate($tahun_ini, $bulan_ini, 1);
         $end_date = Carbon::now();
+
+        // Format tanggal untuk pencarian database
+        $start_date_sql = $start_date->format('Y-m-d');
+        $end_date_sql = $end_date->format('Y-m-d');
+
+        $data_absensi_bulan_ini = KehadiranHarian::where('id_guru', $id_guru)
+            ->whereBetween('tanggal', [$start_date_sql, $end_date_sql])
+            ->select('tanggal', 'id_kelas', 'id_mapel')
+            ->get();
+
+        // Buat Hash Map (Array Asosiatif) untuk pencarian cepat
+        $map_absensi = [];
+        foreach ($data_absensi_bulan_ini as $absen) {
+            $tgl = Carbon::parse($absen->tanggal)->format('Y-m-d');
+            $key = $tgl . '_' . $absen->id_kelas . '_' . $absen->id_mapel;
+            $map_absensi[$key] = true;
+        }
+        // =========================================================================
 
         $total_wajib_absen = 0;
         $sudah_absen = 0;
@@ -69,23 +84,19 @@ class DashboardController extends Controller
         for ($date = $start_date->copy(); $date->lte($end_date); $date->addDay()) {
             if ($date->isSunday()) continue;
 
-            // Kita gunakan translatedFormat('l') untuk mendapatkan nama hari (Senin, Selasa...)
-            // Pastikan database kolom 'hari' isinya: Senin, Selasa, Rabu, Kamis, Jumat, Sabtu
             $nama_hari_indo = $date->translatedFormat('l');
             $tanggal_sql = $date->format('Y-m-d');
 
-            // Cari jadwal pada hari tersebut
-            // Note: Pastikan data di DB kolom 'hari' sesuai dengan output $nama_hari_indo
             $jadwal_harian = $jadwal_semua->where('hari', $nama_hari_indo);
 
             foreach ($jadwal_harian as $jadwal) {
                 $total_wajib_absen++;
 
-                $cek = KehadiranHarian::where('id_guru', $id_guru)
-                    ->where('id_kelas', $jadwal->id_kelas)
-                    ->where('id_mapel', $jadwal->id_mapel)
-                    ->whereDate('tanggal', $tanggal_sql)
-                    ->exists();
+                // =========================================================================
+                // PERBAIKAN 2: Cek data dari memori RAM (array $map_absensi)
+                // =========================================================================
+                $key_cek = $tanggal_sql . '_' . $jadwal->id_kelas . '_' . $jadwal->id_mapel;
+                $cek = isset($map_absensi[$key_cek]);
 
                 if ($cek) {
                     $sudah_absen++;
@@ -96,11 +107,10 @@ class DashboardController extends Controller
                         'kelas' => $jadwal->kelas->nama_kelas ?? '-',
                         'mapel' => $jadwal->mapel->nama_mapel ?? '-',
                         'jam' => Carbon::parse($jadwal->jam_mulai)->format('H:i'),
-
                         'link' => route('absensi.edit', [
                             'id_kelas' => $jadwal->id_kelas,
                             'id_mapel' => $jadwal->id_mapel,
-                            'tanggal' => $tanggal_sql // Format: Y-m-d
+                            'tanggal' => $tanggal_sql
                         ])
                     ];
                 }
@@ -119,7 +129,7 @@ class DashboardController extends Controller
             'sudah_absen',
             'total_wajib_absen',
             'kelas_hrt',
-            'jumlah_siswa_hrt' 
+            'jumlah_siswa_hrt'
         ));
     }
 }
