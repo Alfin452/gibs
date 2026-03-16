@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\User;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Absensi\AbsensiController;
 use App\Http\Controllers\Absensi\DashboardController;
 use App\Http\Controllers\Absensi\HrtTimeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     if (!Auth::check()) {
@@ -44,6 +46,31 @@ Route::middleware('auth')->group(function () {
         Route::get('/get-tanggal', [AbsensiController::class, 'getTanggalAvailable'])->name('get-tanggal');
         Route::get('/daftar-kelas', [AbsensiController::class, 'daftarKelas'])->name('daftar-kelas');
     });
+});
+
+Route::get('/sso-login', function (Request $request) {
+    $token = $request->query('token');
+
+    if (!$token) {
+        return redirect('/login')->withErrors(['sso' => 'Akses tidak sah.']);
+    }
+
+    // Cari user yang memiliki sso_token yang cocok
+    $user = User::where('sso_token', $token)->first();
+
+    if ($user) {
+        // Otomatis login-kan user tersebut ke Laravel
+        Auth::login($user);
+
+        // Langsung hapus tokennya agar aman dan tidak bisa dipakai 2 kali
+        $user->update(['sso_token' => null]);
+
+        // Arahkan ke rute dashboard presensi kamu
+        // Ganti 'dashboard' dengan nama rute dashboard yang kamu punya
+        return redirect()->route('dashboard');
+    }
+
+    return redirect('/login')->withErrors(['sso' => 'Token sesi tidak valid. Silakan login kembali melalui menu utama.']);
 });
 
 require __DIR__ . '/auth.php';

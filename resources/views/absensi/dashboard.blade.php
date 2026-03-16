@@ -6,7 +6,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
             <div>
                 <h2 class="font-extrabold text-2xl text-slate-800 tracking-tight">
-                    {{ __('Overview Absensi') }}
+                    {{ __('Overview Presensi') }}
                 </h2>
                 <p class="text-sm text-slate-500 mt-1">Pantau dan lengkapi jadwal kehadiran kelas Anda bulan ini.</p>
             </div>
