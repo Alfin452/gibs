@@ -191,8 +191,6 @@
                                                     </svg>
                                                     <div>
                                                         <span class="font-bold text-gray-700">{{ $slot->hari }}</span>
-                                                        <span class="text-gray-400 mx-1">•</span>
-                                                        <span class="font-mono">{{ \Carbon\Carbon::parse($slot->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->jam_selesai)->format('H:i') }}</span>
                                                     </div>
                                                 </div>
                                                 @endforeach
