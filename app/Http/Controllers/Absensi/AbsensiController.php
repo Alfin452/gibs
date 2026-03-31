@@ -463,7 +463,7 @@ class AbsensiController extends Controller
             'rekap'
         ));
     }
-    
+
     public function cekLembar(Request $request)
     {
         $request->validate([
@@ -646,7 +646,7 @@ class AbsensiController extends Controller
 
     public function daftarKelas(Request $request)
     {
-        $user = Auth::user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         if (!$user->guru) {
             return redirect()->route('dashboard')->with('error', 'Anda tidak terdaftar sebagai Guru.');
@@ -654,33 +654,34 @@ class AbsensiController extends Controller
 
         $id_guru = $user->guru->id_guru;
 
-        // QUERY BARU: Ambil kombinasi unik (Kelas + Mapel) dari Jadwal
-        // Kita gunakan distinct() agar jika ada jadwal Senin & Kamis, tetap muncul 1 kartu saja.
-        $query = Jadwal::where('id_guru', $id_guru)
-            ->whereNotNull('id_kelas')
-            ->whereNotNull('id_mapel')
-            ->select('id_kelas', 'id_mapel') // Hanya ambil kolom grouping
-            ->distinct() // Pastikan unik
+        // TAMBAHKAN id_major ke dalam select dan ambil relasinya
+        $query = \App\Models\Jadwal::where('id_guru', $id_guru)
+            ->select('id_kelas', 'id_major', 'id_mapel')
+            ->distinct()
             ->with([
                 'mapel',
                 'kelas' => function ($q) {
-                    $q->withCount('siswa'); // Hitung jumlah siswa sekalian
+                    $q->withCount('siswa');
+                },
+                'major' => function ($q) {
+                    $q->withCount('siswa'); // Hitung jumlah siswa dari relasi major
                 }
             ]);
 
-        // Fitur Pencarian
+        // Sesuaikan fitur pencarian agar bisa mencari nama major juga
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->whereHas('kelas', function ($k) use ($search) {
                     $k->where('nama_kelas', 'like', '%' . $search . '%');
+                })->orWhereHas('major', function ($mj) use ($search) {
+                    $mj->where('nama_major', 'like', '%' . $search . '%');
                 })->orWhereHas('mapel', function ($m) use ($search) {
                     $m->where('nama_mapel', 'like', '%' . $search . '%');
                 });
             });
         }
 
-        // Paginate hasil
         $daftar_kelas = $query->paginate(12)->withQueryString();
 
         return view('absensi.kelas.index', compact('daftar_kelas'));
@@ -688,27 +689,42 @@ class AbsensiController extends Controller
 
     public function show(Request $request, $id_kelas, $id_mapel)
     {
-        if (!$this->cekOtorisasiGuru($id_kelas, $id_mapel)) {
+        // Deteksi apakah ini kelas Major (Berawalan 'M')
+        $is_major = strpos($id_kelas, 'M') === 0;
+        $real_id = $is_major ? substr($id_kelas, 1) : $id_kelas;
+        $tipe = $is_major ? 'major' : 'kelas';
+
+        if (!$this->cekOtorisasiGuru($real_id, $id_mapel, $tipe)) {
             abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk melihat data kelas ini.');
         }
 
-        $guru = Auth::user()->guru;
+        $guru = \Illuminate\Support\Facades\Auth::user()->guru;
+        $mapel = \App\Models\Mapel::findOrFail($id_mapel);
 
-        $kelas = Kelas::findOrFail($id_kelas);
-        $mapel = Mapel::findOrFail($id_mapel);
+        // Bedakan pengambilan data Siswa dan Absen
+        if ($is_major) {
+            $major = \App\Models\Major::findOrFail($real_id);
+            $kelas = (object) ['id_kelas' => 'M' . $real_id, 'nama_kelas' => $major->nama_major];
+            $query = \App\Models\Siswa::where('id_major', $real_id);
+            $semuaAbsen = \App\Models\KehadiranHarian::whereNull('id_kelas')
+                ->where('id_mapel', $id_mapel)
+                ->where('id_guru', $guru->id_guru)
+                ->select('id_siswa', 'tanggal', 'status', 'keterangan')
+                ->get();
+        } else {
+            $kelas = \App\Models\Kelas::findOrFail($real_id);
+            $query = \App\Models\Siswa::where('id_kelas', $real_id);
+            $semuaAbsen = \App\Models\KehadiranHarian::where('id_kelas', $real_id)
+                ->where('id_mapel', $id_mapel)
+                ->where('id_guru', $guru->id_guru)
+                ->select('id_siswa', 'tanggal', 'status', 'keterangan')
+                ->get();
+        }
 
-        // 1. Ambil data Siswa sesuai filter search
-        $query = Siswa::where('id_kelas', $id_kelas);
         if ($request->filled('search')) {
             $query->where('nama_siswa', 'like', '%' . $request->search . '%');
         }
         $siswa = $query->orderBy('nama_siswa', 'asc')->get();
-
-        $semuaAbsen = KehadiranHarian::where('id_kelas', $id_kelas)
-            ->where('id_mapel', $id_mapel)
-            ->where('id_guru', $guru->id_guru)
-            ->select('id_siswa', 'tanggal', 'status', 'keterangan') // Ambil kolom yang butuh saja
-            ->get();
 
         $absenGrouped = $semuaAbsen->groupBy('id_siswa');
 
@@ -722,15 +738,10 @@ class AbsensiController extends Controller
 
             $s->list_keterangan = $absenSiswa->filter(function ($item) {
                 return !is_null($item->keterangan) && trim($item->keterangan) !== '';
-            })
-                ->sortByDesc('tanggal')
-                ->values(); // Reset index array
+            })->sortByDesc('tanggal')->values();
 
             $total_data = $s->total_hadir + $s->total_sakit + $s->total_izin + $s->total_alpha;
-
-            $s->persentase = $total_data > 0
-                ? round(($s->total_hadir / $total_data) * 100)
-                : 0;
+            $s->persentase = $total_data > 0 ? round(($s->total_hadir / $total_data) * 100) : 0;
         }
 
         return view('absensi.show', compact('kelas', 'mapel', 'siswa'));

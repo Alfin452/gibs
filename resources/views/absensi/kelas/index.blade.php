@@ -46,6 +46,16 @@
                 @if($daftar_kelas->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach($daftar_kelas as $item)
+                    @php
+                    // Logika pengecekan Major atau Kelas Reguler
+                    $is_major = !empty($item->id_major);
+                    $target_id = $is_major ? 'M' . $item->id_major : $item->id_kelas;
+                    $nama_ruangan = $is_major ? ($item->major->nama_major ?? 'Major') : ($item->kelas->nama_kelas ?? 'Kelas');
+                    $inisial = explode(' ', trim($nama_ruangan));
+                    $siswa_count = $is_major ? ($item->major->siswa_count ?? 0) : ($item->kelas->siswa_count ?? 0);
+                    $tampil_id = $is_major ? 'M' . $item->id_major : $item->id_kelas;
+                    @endphp
+
                     <div class="group bg-white rounded-2xl p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 relative overflow-hidden flex flex-col h-full">
 
                         <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-primary-50 to-white rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 ease-out"></div>
@@ -53,15 +63,15 @@
                         <div class="relative z-10 flex-1">
                             <div class="flex justify-between items-start mb-4">
                                 <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300 shadow-sm">
-                                    <span class="text-lg font-bold">{{ explode(' ', trim($item->kelas->nama_kelas))[0] }}</span>
+                                    <span class="text-lg font-bold">{{ $inisial[0] ?? '' }}</span>
                                 </div>
                                 <span class="bg-gray-50 text-gray-400 text-[10px] font-mono px-2 py-1 rounded-md border border-gray-100">
-                                    #{{ $item->kelas->id_kelas }}
+                                    #{{ $tampil_id }}
                                 </span>
                             </div>
 
                             <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
-                                {{ $item->kelas->nama_kelas }}
+                                {{ $nama_ruangan }}
                             </h3>
 
                             <p class="text-sm text-secondary-500 font-bold mb-4 flex items-center gap-1">
@@ -78,11 +88,11 @@
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                     </svg>
-                                    <span class="text-sm font-semibold">{{ $item->kelas->siswa_count ?? 0 }}</span>
+                                    <span class="text-sm font-semibold">{{ $siswa_count }}</span>
                                     <span class="text-xs text-gray-400">Siswa</span>
                                 </div>
 
-                                <a href="{{ route('absensi.show', ['id_kelas' => $item->id_kelas, 'id_mapel' => $item->id_mapel]) }}"
+                                <a href="{{ route('absensi.show', ['id_kelas' => $target_id, 'id_mapel' => $item->id_mapel]) }}"
                                     class="text-primary-600 hover:text-primary-800 text-sm font-bold flex items-center gap-1 group/link px-3 py-1.5 rounded-lg hover:bg-primary-50 transition-all">
                                     Detail
                                     <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

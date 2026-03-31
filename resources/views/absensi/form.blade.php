@@ -222,43 +222,37 @@
     </script>
 
     @if(isset($siswa_masih_sakit) && $siswa_masih_sakit->count() > 0)
+    @php
+        $hasSakitInClass = false;
+        $pesanHtml = "";
+        
+        foreach($siswa_masih_sakit as $sakit) {
+            $dataSiswa = $siswa->firstWhere('id_siswa', $sakit->id_siswa);
+            if($dataSiswa) {
+                $hasSakitInClass = true;
+                $pesanHtml .= "<li><b>{$dataSiswa->nama_siswa}</b>: Sakit <br><span class='text-xs text-gray-500'>({$sakit->keterangan})</span></li>";
+            }
+        }
+    @endphp
+
+    @if($hasSakitInClass)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let pesanHtml = "";
-            let hasSakitInClass = false; // Flag untuk mengecek apakah ada siswa kelas ini yang sakit
+            let fullHtml = "<div class='text-left mb-4'>" +
+                "<p class='font-bold text-red-600 mb-2'>Sedang Sakit:</p>" +
+                "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>" +
+                `{!! $pesanHtml !!}` +
+                "</ul></div>";
 
-            // Mulai membangun list
-            let listSakit = "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>";
-
-            @foreach($siswa_masih_sakit as $sakit)
-            @php
-            // Cari apakah siswa yang sakit ini ada dalam daftar $siswa di kelas ini
-            $dataSiswa = $siswa -> firstWhere('id_siswa', $sakit -> id_siswa);
-            @endphp
-            @if($dataSiswa)
-            hasSakitInClass = true;
-            pesanHtml += "<li><b>{{ $dataSiswa->nama_siswa }}</b>: Sakit <br><span class='text-xs text-gray-500'>({{ $sakit->keterangan }})</span></li>";
-            @endif
-            @endforeach
-
-            // Jika ditemukan siswa kelas ini yang sakit, tampilkan SweetAlert
-            if (hasSakitInClass) {
-                let fullHtml = "<div class='text-left mb-4'>" +
-                    "<p class='font-bold text-red-600 mb-2'>Sedang Sakit:</p>" +
-                    "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>" +
-                    pesanHtml +
-                    "</ul></div>"
-
-
-                Swal.fire({
-                    title: 'Informasi Medis Siswa',
-                    html: fullHtml,
-                    icon: 'info',
-                    confirmButtonColor: '#3ab09e',
-                    confirmButtonText: 'Baik, Mengerti'
-                });
-            }
+            Swal.fire({
+                title: 'Informasi Medis Siswa',
+                html: fullHtml,
+                icon: 'info',
+                confirmButtonColor: '#3ab09e',
+                confirmButtonText: 'Baik, Mengerti'
+            });
         });
     </script>
+    @endif
     @endif
 </x-absen-layout>
