@@ -107,11 +107,11 @@ class DashboardController extends Controller
                         'kelas' => $jadwal->kelas->nama_kelas ?? '-',
                         'mapel' => $jadwal->mapel->nama_mapel ?? '-',
                         'jam' => Carbon::parse($jadwal->jam_mulai)->format('H:i'),
-                        'link' => route('absensi.edit', [
+                        'link' => ($jadwal->id_kelas && $jadwal->id_mapel) ? route('absensi.edit', [
                             'id_kelas' => $jadwal->id_kelas,
                             'id_mapel' => $jadwal->id_mapel,
                             'tanggal' => $tanggal_sql
-                        ])
+                        ]) : '#'
                     ];
                 }
             }

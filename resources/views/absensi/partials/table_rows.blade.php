@@ -1,4 +1,17 @@
 @forelse($riwayat as $data)
+@php
+// Cek apakah ini jadwal Major atau Kelas Reguler
+$is_major = !empty($data->id_major);
+$target_id = $is_major ? 'M' . $data->id_major : $data->id_kelas;
+
+// Cari nama ruangan agar di tabel tampil nama yang benar
+if ($is_major) {
+$major = \App\Models\Major::find($data->id_major);
+$nama_ruangan = $major ? $major->nama_major : 'Major';
+} else {
+$nama_ruangan = $data->kelas->nama_kelas ?? '-';
+}
+@endphp
 <tr class="hover:bg-gray-50/80 transition-colors duration-200 border-b border-gray-100 last:border-0 group">
 
     <td class="px-6 py-5 whitespace-nowrap">
@@ -14,7 +27,7 @@
 
     <td class="px-6 py-5 whitespace-nowrap">
         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
-            {{ $data->kelas->nama_kelas ?? '-' }}
+            {{ $nama_ruangan }}
         </span>
     </td>
 
@@ -48,7 +61,7 @@
     <td class="px-6 py-5 whitespace-nowrap text-center">
         <div class="flex flex-col lg:flex-row items-center justify-center gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
 
-            <a href="{{ route('absensi.edit', ['id_kelas' => $data->id_kelas, 'id_mapel' => $data->id_mapel, 'tanggal' => $data->tanggal]) }}"
+            <a href="{{ route('absensi.edit', ['id_kelas' => $target_id, 'id_mapel' => $data->id_mapel, 'tanggal' => $data->tanggal]) }}"
                 class="px-4 py-1.5 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300 transition-all shadow-sm w-full lg:w-auto">
                 Edit
             </a>
@@ -57,7 +70,7 @@
             $bln = date('m', strtotime($data->tanggal));
             $thn = date('Y', strtotime($data->tanggal));
             @endphp
-            <a href="{{ route('absensi.laporan.view', ['bulan' => $bln, 'tahun' => $thn, 'id_kelas' => $data->id_kelas, 'id_mapel' => $data->id_mapel]) }}"
+            <a href="{{ route('absensi.laporan.view', ['bulan' => $bln, 'tahun' => $thn, 'id_kelas' => $target_id, 'id_mapel' => $data->id_mapel]) }}"
                 class="px-4 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm w-full lg:w-auto">
                 Rekap
             </a>

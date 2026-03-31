@@ -53,7 +53,8 @@
         <form action="{{ route('absensi.store') }}" method="POST" id="form-absensi">
             @csrf
             <input type="hidden" name="tanggal" value="{{ $tanggal }}">
-            <input type="hidden" name="id_kelas" value="{{ $infoKelas->id_kelas }}">
+            <input type="hidden" name="id_kelas" value="{{ $infoKelas->id_kelas ?? '' }}">
+            <input type="hidden" name="id_major" value="{{ $infoKelas->id_major ?? '' }}">
             <input type="hidden" name="id_mapel" value="{{ $infoMapel->id_mapel }}">
 
             <div class="bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-200">
@@ -232,7 +233,7 @@
             @foreach($siswa_masih_sakit as $sakit)
             @php
             // Cari apakah siswa yang sakit ini ada dalam daftar $siswa di kelas ini
-            $dataSiswa = $siswa->firstWhere('id_siswa', $sakit->id_siswa);
+            $dataSiswa = $siswa -> firstWhere('id_siswa', $sakit -> id_siswa);
             @endphp
             @if($dataSiswa)
             hasSakitInClass = true;
@@ -246,8 +247,8 @@
                     "<p class='font-bold text-red-600 mb-2'>Sedang Sakit:</p>" +
                     "<ul class='list-disc pl-5 space-y-2 text-sm text-gray-700'>" +
                     pesanHtml +
-                    "</ul></div>" 
-                    
+                    "</ul></div>"
+
 
                 Swal.fire({
                     title: 'Informasi Medis Siswa',
