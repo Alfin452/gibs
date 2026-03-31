@@ -212,9 +212,10 @@
                                         onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $idTarget }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $namaRuangKelas }}', '{{ $tipeJadwal }}')">
 
                                         <!-- Watermark Elegan Muncul Saat Hover -->
-                                        <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-5 transition-all duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-2 group-hover:-translate-y-2 pointer-events-none">
-                                            <svg class="w-32 h-32 text-primary-900" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                        <div class="absolute -top-4 -right-4 p-4 opacity-0 group-hover:opacity-[0.03] transition-all duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0 pointer-events-none">
+                                            <svg class="w-36 h-36 text-primary-900" fill="currentColor" viewBox="0 0 24 24">
+                                                <!-- Ikon Buku (Book) -->
+                                                <path d="M21 4H7a2 2 0 00-2 2v12a2 2 0 002 2h14a1 1 0 001-1V5a1 1 0 00-1-1zm-1 14H7.5a.5.5 0 01-.5-.5v-11a.5.5 0 01.5-.5H20v12zM6 18H4V6h2v12z"/>
                                             </svg>
                                         </div>
 
@@ -225,13 +226,13 @@
                                                         <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3 border border-gray-200 shadow-sm transition-all duration-300 group-hover:bg-primary-50 group-hover:text-primary-700 group-hover:border-primary-100">
                                                             {{ $namaRuangKelas }}
                                                         </span>
-                                                        <h4 class="text-xl font-extrabold text-gray-800 group-hover:text-primary-700 transition-colors leading-snug tracking-tight">
+                                                        <h4 class="text-xl font-extrabold text-gray-800 group-hover:text-primary-700 transition-colors leading-snug tracking-tight w-[85%] pr-2">
                                                             {{ $jadwal_utama->mapel->nama_mapel }}
                                                         </h4>
                                                     </div>
                                                     
-                                                    <!-- Checkmark Premium Bulat -->
-                                                    <div class="checkmark hidden items-center justify-center min-w-[32px] w-8 h-8 bg-primary-500 text-white rounded-full shadow-md shrink-0 ring-4 ring-primary-50 transition-all">
+                                                    <!-- Checkmark Absolut di Pojok -->
+                                                    <div class="checkmark hidden absolute top-6 right-6 z-20 flex items-center justify-center w-8 h-8 bg-primary-500 text-white rounded-full shadow-md shrink-0 ring-4 ring-primary-50 transition-all">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                                                         </svg>
