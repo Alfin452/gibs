@@ -81,20 +81,25 @@ class AbsensiController extends Controller
 
         $id_guru_aktif = $user->guru->id_guru;
 
-        // Ambil semua jadwal
+        // 1. Ambil jadwal beserta relasi kelas, mapel, DAN major
         $jadwal_guru = Jadwal::where('id_guru', $id_guru_aktif)
-            ->with(['mapel', 'kelas'])
-            ->orderBy('id_kelas') // Urutkan biar rapi
+            ->with(['mapel', 'kelas', 'major'])
+            ->orderBy('id_kelas')
+            ->orderBy('id_major')
             ->get();
 
         if ($jadwal_guru->isEmpty()) {
             return redirect()->route('absensi.index')->with('warning', 'Halo ' . $user->guru->nama_guru . ', Anda belum memiliki jadwal mengajar.');
         }
 
-        // GROUPING BARU: Kelompokkan berdasarkan ID Kelas & Mapel
-        // Ini menghasilkan Collection of Collections, di mana setiap item berisi array jadwal untuk kelas & mapel tersebut
+        // 2. GROUPING BARU: Kelompokkan dengan prefix untuk membedakan Kelas dan Major
         $kelompok_jadwal = $jadwal_guru->groupBy(function ($item) {
-            return $item->id_kelas . '-' . $item->id_mapel;
+            // Jika ada id_major, gunakan awalan 'MAJOR-', jika tidak gunakan 'KELAS-'
+            if ($item->id_major) {
+                return 'MAJOR-' . $item->id_major . '-' . $item->id_mapel;
+            } else {
+                return 'KELAS-' . $item->id_kelas . '-' . $item->id_mapel;
+            }
         });
 
         return view('absensi.create', compact('kelompok_jadwal'));
@@ -102,7 +107,6 @@ class AbsensiController extends Controller
 
     public function cekLembar(Request $request)
     {
-        // 1. Validasi dropdown gabungan 'kombinasi_jadwal'
         $request->validate([
             'tanggal' => 'required|date',
             'kombinasi_jadwal' => 'required',
@@ -115,39 +119,46 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda tidak dapat melakukan absensi untuk tanggal di masa depan (Waktu Server).');
         }
 
-        // 2. Pecah string value menjadi ID terpisah
+        // Pecah string value menjadi 3 bagian (Tipe - ID Target - ID Mapel)
         $ids = explode('-', $request->kombinasi_jadwal);
 
-        if (count($ids) !== 2) {
+        if (count($ids) !== 3) {
             return back()->with('error', 'Format jadwal tidak valid.');
         }
 
-        $id_kelas = $ids[0];
-        $id_mapel = $ids[1];
+        $tipe = $ids;
+        $id_target = $ids;
+        $id_mapel = $ids;
         $tanggal = $request->tanggal;
 
-        if (!$this->cekOtorisasiGuru($id_kelas, $id_mapel)) {
-            abort(403, 'Akses Ditolak: Anda tidak mengajar di kelas & mata pelajaran tersebut.');
+        if (!$this->cekOtorisasiGuru($id_target, $id_mapel, $tipe)) {
+            abort(403, 'Akses Ditolak: Anda tidak mengajar di kelas/major & mata pelajaran tersebut.');
         }
-        // 3. Logika pengecekan duplikasi
-        $sudah_absen = KehadiranHarian::where('tanggal', $tanggal)
-            ->where('id_kelas', $id_kelas)
-            ->where('id_mapel', $id_mapel)
-            ->exists();
 
-        if ($sudah_absen) {
+        // Cek Duplikasi
+        $query_duplikasi = KehadiranHarian::where('tanggal', $tanggal)
+            ->where('id_mapel', $id_mapel);
+
+        if ($tipe === 'kelas') {
+            $query_duplikasi->where('id_kelas', $id_target);
+        }
+
+        if ($query_duplikasi->exists()) {
             return redirect()->route('absensi.index')->with('warning', 'Absensi untuk tanggal ini sudah ada! Silakan edit di menu riwayat.');
         }
 
-        // 4. Ambil data untuk form absensi
-        $siswa = Siswa::where('id_kelas', $id_kelas)
-            ->orderBy('nama_siswa', 'asc')
-            ->get();
+        // Ambil data Siswa sesuai dengan Tipe (Kelas / Major)
+        if ($tipe === 'major') {
+            $siswa = Siswa::where('id_major', $id_target)->orderBy('nama_siswa', 'asc')->get();
+            // Buat objek dummy agar tampilan form.blade.php tidak error mencari variabel $infoKelas
+            $major = \App\Models\Major::find($id_target);
+            $infoKelas = (object) ['id_kelas' => null, 'nama_kelas' => $major->nama_major ?? 'Major'];
+        } else {
+            $siswa = Siswa::where('id_kelas', $id_target)->orderBy('nama_siswa', 'asc')->get();
+            $infoKelas = Kelas::find($id_target);
+        }
 
-        // INI VARIABEL YANG HILANG SEBELUMNYA
-        $infoKelas = Kelas::find($id_kelas);
         $infoMapel = Mapel::find($id_mapel);
-
         $tanggal_absen = Carbon::parse($tanggal)->startOfDay();
 
         // 1. Siswa yang MASIH SAKIT (Belum ada yang meng-absen H)
@@ -167,22 +178,21 @@ class AbsensiController extends Controller
             $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
         }
 
-        // 2. Siswa yang BARU SEMBUH HARI INI (Sudah dikonfirmasi Hadir oleh guru lain)
+        // 2. Siswa yang BARU SEMBUH HARI INI
         $siswa_baru_sembuh_db = DB::table('sakit_siswa')
             ->where('status_akhir', 'Kembali ke Kelas')
-            ->whereDate('updated_at', Carbon::parse($tanggal)->toDateString()) // Sembuh pada hari absen ini
+            ->whereDate('updated_at', Carbon::parse($tanggal)->toDateString())
             ->get();
 
         $siswa_baru_sembuh = collect();
         foreach ($siswa_baru_sembuh_db as $sembuh) {
-            // Cari siapa guru yang PERTAMA KALI mengabsen 'H' di hari ini
             $konfirmasi = DB::table('kehadiran_harian')
                 ->join('guru', 'kehadiran_harian.id_guru', '=', 'guru.id_guru')
                 ->join('mapel', 'kehadiran_harian.id_mapel', '=', 'mapel.id_mapel')
                 ->where('kehadiran_harian.id_siswa', $sembuh->id_siswa)
                 ->where('kehadiran_harian.tanggal', $tanggal)
                 ->where('kehadiran_harian.status', 'H')
-                ->orderBy('kehadiran_harian.updated_at', 'asc') // Cari yang paling awal
+                ->orderBy('kehadiran_harian.updated_at', 'asc')
                 ->select('guru.nama_guru', 'mapel.nama_mapel')
                 ->first();
 
@@ -193,8 +203,6 @@ class AbsensiController extends Controller
             }
         }
 
-        // Pastikan variabel yang di-compact disesuaikan
-        // (Di method edit tambahkan 'dataKehadiran' di dalam compact-nya)
         return view('absensi.form', compact('siswa', 'tanggal', 'infoKelas', 'infoMapel', 'siswa_masih_sakit', 'siswa_baru_sembuh'));
     }
 
@@ -476,14 +484,20 @@ class AbsensiController extends Controller
     public function getTanggalAvailable(Request $request)
     {
         $id_kelas = $request->id_kelas;
+        $id_major = $request->id_major;
         $id_mapel = $request->id_mapel;
         $bulan = $request->bulan;
         $tahun = $request->tahun;
 
-        $jadwal_hari = Jadwal::where('id_kelas', $id_kelas)
-            ->where('id_mapel', $id_mapel)
-            ->pluck('hari')
-            ->toArray();
+        // Cek jadwal berdasarkan Major atau Kelas
+        $query_jadwal = Jadwal::where('id_mapel', $id_mapel);
+        if ($id_major) {
+            $query_jadwal->where('id_major', $id_major);
+        } else {
+            $query_jadwal->where('id_kelas', $id_kelas);
+        }
+
+        $jadwal_hari = $query_jadwal->pluck('hari')->toArray();
 
         if (empty($jadwal_hari)) {
             return response()->json([]);
@@ -491,16 +505,18 @@ class AbsensiController extends Controller
 
         $list_tanggal = [];
         $jumlah_hari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
-
-       
         $start_date = date('Y-m-d', mktime(0, 0, 0, $bulan, 1, $tahun));
         $end_date = date('Y-m-d', mktime(0, 0, 0, $bulan, $jumlah_hari, $tahun));
 
-        $data_absen = KehadiranHarian::where('id_kelas', $id_kelas)
-            ->where('id_mapel', $id_mapel)
-            ->whereBetween('tanggal', [$start_date, $end_date])
-            ->pluck('tanggal') // Hanya tarik kolom tanggal
-            ->toArray();
+        // Tarik data absen untuk mengecek tanggal mana yang sudah diisi
+        $absen_query = KehadiranHarian::where('id_mapel', $id_mapel)
+            ->whereBetween('tanggal', [$start_date, $end_date]);
+
+        if ($id_kelas) {
+            $absen_query->where('id_kelas', $id_kelas);
+        }
+
+        $data_absen = $absen_query->pluck('tanggal')->toArray();
 
         $sudah_absen_array = array_map(function ($tgl) {
             return date('Y-m-d', strtotime($tgl));
@@ -523,15 +539,12 @@ class AbsensiController extends Controller
             $hari_indo = $map_hari[$nama_hari_inggris] ?? '';
 
             if (in_array($hari_indo, $jadwal_hari)) {
-
-            
                 $sudah_absen = in_array($date, $sudah_absen_array);
-
                 $list_tanggal[] = [
                     'tanggal' => $date,
                     'hari' => $hari_indo,
                     'tampilan' => date('d F Y', strtotime($date)) . " ($hari_indo)",
-                    'status' => $sudah_absen ? 'sudah' : 'belum' // Flag untuk UI
+                    'status' => $sudah_absen ? 'sudah' : 'belum'
                 ];
             }
         }
@@ -627,16 +640,20 @@ class AbsensiController extends Controller
         return view('absensi.show', compact('kelas', 'mapel', 'siswa'));
     }
 
-    private function cekOtorisasiGuru($id_kelas, $id_mapel)
+    private function cekOtorisasiGuru($id_target, $id_mapel, $tipe = 'kelas')
     {
         $guru = Auth::user()->guru;
-
         if (!$guru) return false;
 
-        // Cek ke database apakah ada jadwal untuk guru ini dengan kelas & mapel yang diminta
-        return \App\Models\Jadwal::where('id_guru', $guru->id_guru)
-            ->where('id_kelas', $id_kelas)
-            ->where('id_mapel', $id_mapel)
-            ->exists();
+        $query = \App\Models\Jadwal::where('id_guru', $guru->id_guru)
+            ->where('id_mapel', $id_mapel);
+
+        if ($tipe === 'major') {
+            $query->where('id_major', $id_target);
+        } else {
+            $query->where('id_kelas', $id_target);
+        }
+
+        return $query->exists();
     }
 }

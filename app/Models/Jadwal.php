@@ -24,4 +24,10 @@ class Jadwal extends Model
     {
         return $this->belongsTo(Guru::class, 'id_guru', 'id_guru');
     }
+
+    // TAMBAHAN: Relasi ke tabel Major
+    public function major()
+    {
+        return $this->belongsTo(Major::class, 'id_major', 'id_major');
+    }
 }

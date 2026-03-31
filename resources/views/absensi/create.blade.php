@@ -126,7 +126,9 @@
             <form action="{{ route('absensi.cek') }}" method="POST" id="form-absensi">
                 @csrf
                 <input type="hidden" name="id_mapel" id="id_mapel" required>
-                <input type="hidden" name="id_kelas" id="id_kelas" required>
+                <input type="hidden" name="id_kelas" id="id_kelas">
+                <input type="hidden" name="id_major" id="id_major">
+                <input type="hidden" name="tipe_jadwal" id="tipe_jadwal">
                 <input type="hidden" name="kombinasi_jadwal" id="kombinasi_jadwal">
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -172,14 +174,27 @@
                                 @if(isset($kelompok_jadwal) && count($kelompok_jadwal) > 0)
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     @foreach($kelompok_jadwal as $group)
-                                    @php $jadwal_utama = $group->first(); @endphp
+                                    @php
+                                    $jadwal_utama = $group->first();
+
+                                    // Pengecekan Kelas atau Major
+                                    if ($jadwal_utama->id_major) {
+                                    $idTarget = $jadwal_utama->id_major;
+                                    $namaRuangKelas = $jadwal_utama->major->nama_major ?? 'Major Tidak Diketahui';
+                                    $tipeJadwal = 'major';
+                                    } else {
+                                    $idTarget = $jadwal_utama->id_kelas;
+                                    $namaRuangKelas = $jadwal_utama->kelas->nama_kelas ?? 'Kelas Tidak Diketahui';
+                                    $tipeJadwal = 'kelas';
+                                    }
+                                    @endphp
 
                                     <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-500 hover:shadow-md hover:ring-2 hover:ring-primary-500/20 rounded-xl p-5 transition-all duration-200 relative overflow-hidden"
-                                        onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $jadwal_utama->id_kelas }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $jadwal_utama->kelas->nama_kelas }}')">
+                                        onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $idTarget }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $namaRuangKelas }}', '{{ $tipeJadwal }}')">
 
                                         <div class="relative z-10">
                                             <div class="mb-3">
-                                                <p class="text-xs font-bold text-primary-600 uppercase tracking-wide mb-1">{{ $jadwal_utama->kelas->nama_kelas }}</p>
+                                                <p class="text-xs font-bold text-primary-600 uppercase tracking-wide mb-1">{{ $namaRuangKelas }}</p>
                                                 <h4 class="text-lg font-bold text-gray-900 group-hover:text-secondary-600 transition-colors leading-snug">{{ $jadwal_utama->mapel->nama_mapel }}</h4>
                                             </div>
                                             <div class="h-px bg-gray-100 w-full mb-3"></div>
@@ -293,7 +308,7 @@
         </div>
     </div>
 
-    <div id="warning-modal" class="relative z-[9999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="warning-modal" class="relative z- hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity"></div>
 
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -360,7 +375,7 @@
                         showWarningModal(dateStr);
 
                         fpInstance.clear();
-                        document.getElementById('selection-preview').classList.add('hidden');
+                        document.getElementById('selection-preview').classList.add('hidden', 'opacity-0', 'translate-y-4');
                         return;
                     }
 
@@ -419,7 +434,7 @@
         }
         // -------------------------
 
-        function pilihJadwal(el, idMapel, idKelas, namaMapel, namaKelas) {
+        function pilihJadwal(el, idMapel, idTarget, namaMapel, namaKelas, tipeJadwal) {
             // Disesuaikan class JS-nya menjadi primary
             document.querySelectorAll('.jadwal-card').forEach(card => {
                 card.classList.remove('ring-2', 'ring-primary-600', 'bg-primary-50', 'border-primary-600');
@@ -429,13 +444,23 @@
             el.querySelector('.checkmark').classList.remove('hidden');
 
             document.getElementById('id_mapel').value = idMapel;
-            document.getElementById('id_kelas').value = idKelas;
-            document.getElementById('kombinasi_jadwal').value = `${idKelas}-${idMapel}`;
+
+            // Penyesuaian pengisian hidden input bergantung pada Major atau Kelas
+            if (tipeJadwal === 'major') {
+                document.getElementById('id_major').value = idTarget;
+                document.getElementById('id_kelas').value = '';
+            } else {
+                document.getElementById('id_kelas').value = idTarget;
+                document.getElementById('id_major').value = '';
+            }
+
+            document.getElementById('tipe_jadwal').value = tipeJadwal;
+            document.getElementById('kombinasi_jadwal').value = `${tipeJadwal}-${idTarget}-${idMapel}`;
 
             document.getElementById('preview-mapel').innerText = namaMapel;
             document.getElementById('preview-kelas').innerText = namaKelas;
 
-            document.getElementById('selection-preview').classList.add('hidden');
+            document.getElementById('selection-preview').classList.add('hidden', 'opacity-0', 'translate-y-4');
             document.getElementById('empty-state-action').classList.remove('hidden');
 
             fetchTanggalAvailable();
@@ -444,19 +469,28 @@
         async function fetchTanggalAvailable() {
             const mapel = document.getElementById('id_mapel').value;
             const kelas = document.getElementById('id_kelas').value;
+            const major = document.getElementById('id_major').value;
+            const tipe = document.getElementById('tipe_jadwal').value;
             const bulan = document.getElementById('bulan').value;
             const tahun = document.getElementById('tahun').value;
             const loading = document.getElementById('loading-indicator');
             const statusText = document.getElementById('calendar-status');
 
-            if (!mapel || !kelas) return;
+            if (!mapel || (!kelas && !major)) return;
 
             loading.classList.remove('hidden');
             statusText.innerText = "";
             document.getElementById('tanggal').disabled = true;
 
             try {
-                const url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&id_kelas=${kelas}&bulan=${bulan}&tahun=${tahun}`;
+                // Modifikasi URL request berdasarkan tipe yang dipilih (Major / Kelas)
+                let url = `{{ route('absensi.get-tanggal') }}?id_mapel=${mapel}&bulan=${bulan}&tahun=${tahun}`;
+                if (tipe === 'major') {
+                    url += `&id_major=${major}`;
+                } else {
+                    url += `&id_kelas=${kelas}`;
+                }
+
                 const response = await fetch(url);
                 if (!response.ok) throw new Error("Gagal mengambil data");
 
