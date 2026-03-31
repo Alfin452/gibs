@@ -112,8 +112,27 @@
             box-shadow: 0 4px 6px -1px rgba(58, 176, 158, 0.3);
         }
 
+        /* Hari Ini (Today) */
         .flatpickr-day.today {
-            border-color: #e5e7eb;
+            border: 2px solid #f59e0b !important; /* Warna Amber/Orange biar menonjol */
+            color: #d97706 !important;
+            font-weight: 800;
+            background: #fffbeb;
+        }
+
+        /* Hari Ini jika statusnya disabled (belum ada jadwal) */
+        .flatpickr-day.today.flatpickr-disabled {
+            border: 2px dashed #fcd34d !important;
+            background: transparent;
+            color: #9ca3af !important;
+            opacity: 0.7;
+        }
+
+        /* Hari ini tapi sedang terpilih */
+        .flatpickr-day.today.selected {
+            background: #3ab09e !important;
+            color: #ffffff !important;
+            border-color: #3ab09e !important;
         }
     </style>
 
@@ -189,32 +208,45 @@
                                     }
                                     @endphp
 
-                                    <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-500 hover:shadow-md hover:ring-2 hover:ring-primary-500/20 rounded-xl p-5 transition-all duration-200 relative overflow-hidden"
+                                    <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-400 hover:bg-gradient-to-br hover:from-white hover:to-primary-50/30 hover:shadow-[0_12px_35px_-12px_rgba(58,176,158,0.25)] hover:-translate-y-1.5 rounded-[20px] p-6 transition-all duration-300 relative overflow-hidden flex flex-col h-full"
                                         onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $idTarget }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $namaRuangKelas }}', '{{ $tipeJadwal }}')">
 
-                                        <div class="relative z-10">
-                                            <div class="mb-3">
-                                                <p class="text-xs font-bold text-primary-600 uppercase tracking-wide mb-1">{{ $namaRuangKelas }}</p>
-                                                <h4 class="text-lg font-bold text-gray-900 group-hover:text-secondary-600 transition-colors leading-snug">{{ $jadwal_utama->mapel->nama_mapel }}</h4>
-                                            </div>
-                                            <div class="h-px bg-gray-100 w-full mb-3"></div>
-                                            <div class="space-y-2">
-                                                @foreach($group as $slot)
-                                                <div class="flex items-start gap-2 text-xs text-gray-500 group-hover:text-gray-600">
-                                                    <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    <div>
-                                                        <span class="font-bold text-gray-700">{{ $slot->hari }}</span>
+                                        <!-- Watermark Elegan Muncul Saat Hover -->
+                                        <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-5 transition-all duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-2 group-hover:-translate-y-2 pointer-events-none">
+                                            <svg class="w-32 h-32 text-primary-900" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                            </svg>
+                                        </div>
+
+                                        <div class="relative z-10 flex flex-col flex-1">
+                                            <div class="flex-1 mb-5">
+                                                <div class="flex items-start justify-between gap-4">
+                                                    <div class="w-full">
+                                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3 border border-gray-200 shadow-sm transition-all duration-300 group-hover:bg-primary-50 group-hover:text-primary-700 group-hover:border-primary-100">
+                                                            {{ $namaRuangKelas }}
+                                                        </span>
+                                                        <h4 class="text-xl font-extrabold text-gray-800 group-hover:text-primary-700 transition-colors leading-snug tracking-tight">
+                                                            {{ $jadwal_utama->mapel->nama_mapel }}
+                                                        </h4>
+                                                    </div>
+                                                    
+                                                    <!-- Checkmark Premium Bulat -->
+                                                    <div class="checkmark hidden items-center justify-center min-w-[32px] w-8 h-8 bg-primary-500 text-white rounded-full shadow-md shrink-0 ring-4 ring-primary-50 transition-all">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            
+                                            <!-- List Hari Lengkap Tanpa Ikon -->
+                                            <div class="pt-4 border-t border-gray-100 flex flex-wrap gap-2 items-center mt-auto">
+                                                @foreach($group as $slot)
+                                                <span class="inline-flex items-center justify-center py-1.5 px-3 rounded-lg bg-gray-50 border border-gray-100 text-xs font-bold text-gray-500 group-hover:bg-white group-hover:text-primary-600 group-hover:border-primary-200 group-hover:shadow-sm transition-all duration-300">
+                                                    {{ $slot->hari }}
+                                                </span>
                                                 @endforeach
                                             </div>
-                                        </div>
-                                        <div class="checkmark hidden absolute top-4 right-4 bg-primary-600 text-white rounded-full p-1 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                            </svg>
                                         </div>
                                     </div>
                                     @endforeach
