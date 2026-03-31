@@ -64,14 +64,15 @@ class DashboardController extends Controller
 
         $data_absensi_bulan_ini = KehadiranHarian::where('id_guru', $id_guru)
             ->whereBetween('tanggal', [$start_date_sql, $end_date_sql])
-            ->select('tanggal', 'id_kelas', 'id_mapel')
+            ->select('tanggal', 'id_kelas', 'id_mapel', 'id_major')
             ->get();
 
         // Buat Hash Map (Array Asosiatif) untuk pencarian cepat
         $map_absensi = [];
         foreach ($data_absensi_bulan_ini as $absen) {
             $tgl = Carbon::parse($absen->tanggal)->format('Y-m-d');
-            $key = $tgl . '_' . $absen->id_kelas . '_' . $absen->id_mapel;
+            $target_id = $absen->id_major ? 'M' . $absen->id_major : $absen->id_kelas;
+            $key = $tgl . '_' . $target_id . '_' . $absen->id_mapel;
             $map_absensi[$key] = true;
         }
         // =========================================================================
@@ -95,23 +96,35 @@ class DashboardController extends Controller
                 // =========================================================================
                 // PERBAIKAN 2: Cek data dari memori RAM (array $map_absensi)
                 // =========================================================================
-                $key_cek = $tanggal_sql . '_' . $jadwal->id_kelas . '_' . $jadwal->id_mapel;
+                $target_id = $jadwal->id_major ? 'M' . $jadwal->id_major : $jadwal->id_kelas;
+                $key_cek = $tanggal_sql . '_' . $target_id . '_' . $jadwal->id_mapel;
                 $cek = isset($map_absensi[$key_cek]);
 
                 if ($cek) {
                     $sudah_absen++;
                 } else {
+                    $nama_kelas_tampil = $jadwal->id_major ? ($jadwal->major->nama_major ?? 'Major') : ($jadwal->kelas->nama_kelas ?? '-');
+
+                    $link_url = '#';
+                    if ($target_id && $jadwal->id_mapel) {
+                        try {
+                            $link_url = route('absensi.edit', [
+                                'id_kelas' => $target_id,
+                                'id_mapel' => $jadwal->id_mapel,
+                                'tanggal' => $tanggal_sql
+                            ]);
+                        } catch (\Exception $e) {
+                            $link_url = '#';
+                        }
+                    }
+
                     $tunggakan_absen[] = [
                         'tanggal' => $date->translatedFormat('d F Y'),
                         'hari' => $nama_hari_indo,
-                        'kelas' => $jadwal->kelas->nama_kelas ?? '-',
+                        'kelas' => $nama_kelas_tampil,
                         'mapel' => $jadwal->mapel->nama_mapel ?? '-',
                         'jam' => Carbon::parse($jadwal->jam_mulai)->format('H:i'),
-                        'link' => ($jadwal->id_kelas && $jadwal->id_mapel) ? route('absensi.edit', [
-                            'id_kelas' => $jadwal->id_kelas,
-                            'id_mapel' => $jadwal->id_mapel,
-                            'tanggal' => $tanggal_sql
-                        ]) : '#'
+                        'link' => $link_url
                     ];
                 }
             }
