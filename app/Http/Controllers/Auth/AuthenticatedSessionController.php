@@ -42,6 +42,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->away('https://portal.gibs.sch.id/logout.php');
+        return redirect()->away('https://portal.gibs.sch.id/login');
     }
 }

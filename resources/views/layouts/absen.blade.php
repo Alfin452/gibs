@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- <title>Presensi - Portal GIBS</title> -->
     <title>Portal GIBS - Presensi </title>
     <link rel="icon" type="image/png" href="{{ asset('images/gibs.png') }}">
@@ -68,25 +68,34 @@
 
     <div class="min-h-screen flex flex-row relative">
 
-        <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/50 z-20 hidden md:hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
+        <div id="mobile-overlay"
+            class="fixed inset-0 bg-gray-900/50 z-20 hidden md:hidden transition-opacity backdrop-blur-sm"
+            onclick="toggleSidebar()"></div>
 
-        <aside class="w-72 bg-gradient-to-b from-primary-900 to-primary-950 border-r border-primary-800 min-h-screen fixed left-0 top-0 hidden md:flex flex-col z-30 shadow-xl transition-all duration-300 text-white">
+        <aside
+            class="w-72 bg-gradient-to-b from-primary-900 to-primary-950 border-r border-primary-800 min-h-screen fixed left-0 top-0 hidden md:flex flex-col z-30 shadow-xl transition-all duration-300 text-white">
 
             <div class="h-20 flex items-center px-8 border-b border-white/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
                     {{-- LOGO CONTAINER DESKTOP --}}
                     <div class="relative w-12 h-12 flex items-center justify-center">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-xl blur opacity-40 group-hover:opacity-80 group-hover:blur-md transition-all duration-500"></div>
-                        <div class="relative w-full h-full bg-black border border-white/10 rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-300">
-                            <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none"></div>
-                            <img src="{{ asset('images/logo-gibs.png') }}"
-                                alt="Logo GIBS"
+                        <div
+                            class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-xl blur opacity-40 group-hover:opacity-80 group-hover:blur-md transition-all duration-500">
+                        </div>
+                        <div
+                            class="relative w-full h-full bg-black border border-white/10 rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-300">
+                            <div
+                                class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none">
+                            </div>
+                            <img src="{{ asset('images/logo-gibs.png') }}" alt="Logo GIBS"
                                 class="relative z-10 w-full h-full object-cover">
                         </div>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-lg font-extrabold text-white tracking-tight leading-none group-hover:text-secondary-300 transition-colors">PORTAL</span>
-                        <span class="text-xs font-bold text-primary-300 tracking-[0.2em] leading-none mt-1">PRESENSI</span>
+                        <span
+                            class="text-lg font-extrabold text-white tracking-tight leading-none group-hover:text-secondary-300 transition-colors">PORTAL</span>
+                        <span
+                            class="text-xs font-bold text-primary-300 tracking-[0.2em] leading-none mt-1">PRESENSI</span>
                     </div>
                 </a>
             </div>
@@ -100,10 +109,15 @@
                 <a href="{{ route('dashboard') }}"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('dashboard') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('dashboard'))
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]"></div>
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]">
+                        </div>
                     @endif
-                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('dashboard') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('dashboard') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
                     </svg>
                     <span class="text-sm">Dashboard</span>
                 </a>
@@ -115,10 +129,15 @@
                 <a href="{{ route('absensi.daftar-kelas') }}"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('absensi.daftar-kelas') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('absensi.daftar-kelas'))
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]"></div>
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]">
+                        </div>
                     @endif
-                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.daftar-kelas') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.daftar-kelas') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                        </path>
                     </svg>
                     <span class="text-sm">Daftar Kelas</span>
                 </a>
@@ -126,10 +145,15 @@
                 <a href="{{ route('absensi.create') }}"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('absensi.create') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('absensi.create'))
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]"></div>
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]">
+                        </div>
                     @endif
-                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.create') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.create') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                        </path>
                     </svg>
                     <span class="text-sm">Input Kehadiran</span>
                 </a>
@@ -137,50 +161,76 @@
                 <a href="{{ route('absensi.index') }}"
                     class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('absensi.index') || request()->routeIs('absensi.laporan*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
                     @if(request()->routeIs('absensi.index') || request()->routeIs('absensi.laporan*'))
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]"></div>
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]">
+                        </div>
                     @endif
-                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.index') || request()->routeIs('absensi.laporan*') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('absensi.index') || request()->routeIs('absensi.laporan*') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                        </path>
                     </svg>
                     <span class="text-sm">Rekap Kehadiran</span>
                 </a>
 
                 @php
-                // Mengecek apakah user adalah guru dan memiliki is_hrt yang valid (tidak null/0)
-                $isHrt = Auth::user()?->guru?->is_hrt;
+                    // Mengecek apakah user adalah guru dan memiliki is_hrt yang valid (tidak null/0)
+                    $isHrt = Auth::user()?->guru?->is_hrt;
                 @endphp
 
                 @if($isHrt)
-                <a href="{{ route('hrt.time.index') }}"
-                    class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('hrt.time*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
-                    @if(request()->routeIs('hrt.time*'))
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]"></div>
-                    @endif
-                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('hrt.time*') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="text-sm">HRT Time</span>
-                </a>
-                @else
-                <div class="flex items-center justify-between px-4 py-3.5 rounded-xl text-primary-100/30 opacity-60 cursor-not-allowed select-none" title="Menu ini khusus untuk HRT">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <a href="{{ route('hrt.time.index') }}"
+                        class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden {{ request()->routeIs('hrt.time*') ? 'bg-white/10 text-white shadow-inner border border-white/10 font-semibold' : 'text-primary-100/70 hover:bg-white/5 hover:text-white' }}">
+                        @if(request()->routeIs('hrt.time*'))
+                            <div
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-secondary-400 rounded-r-full shadow-[0_0_10px_rgba(255,148,78,0.5)]">
+                            </div>
+                        @endif
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('hrt.time*') ? 'text-secondary-400' : 'text-primary-300 group-hover:text-white' }}"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="text-sm">HRT Time</span>
+                    </a>
+                @else
+                    <div class="flex items-center justify-between px-4 py-3.5 rounded-xl text-primary-100/30 opacity-60 cursor-not-allowed select-none"
+                        title="Menu ini khusus untuk HRT">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm">HRT Time</span>
+                        </div>
+                        <svg class="w-4 h-4 text-primary-100/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
                     </div>
-                    <svg class="w-4 h-4 text-primary-100/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                </div>
                 @endif
             </nav>
 
             <div class="p-4 border-t border-primary-800/50 bg-primary-950/20">
-                <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-primary-900/50 border border-primary-800 group hover:border-primary-700 hover:shadow-lg hover:bg-primary-900 transition-all duration-300">
+                <a href="https://portal.gibs.sch.id/menu"
+                    class="flex items-center gap-3 px-4 py-3 mb-4 w-full rounded-xl text-white bg-white/10 border border-white/10 hover:bg-amber-500/80 hover:border-amber-500 transition-all duration-200 group">
+                    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span class="text-sm font-semibold">Kembali ke Menu Utama</span>
+                </a>
+                
+                <div
+                    class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-primary-900/50 border border-primary-800 group hover:border-primary-700 hover:shadow-lg hover:bg-primary-900 transition-all duration-300">
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-full bg-primary-700 border-2 border-primary-600 flex items-center justify-center text-white shrink-0 shadow-sm">
-                            <span class="font-bold text-sm">{{ substr(Auth::user()->nama ?? Auth::user()->username ?? 'U', 0, 1) }}</span>
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary-700 border-2 border-primary-600 flex items-center justify-center text-white shrink-0 shadow-sm">
+                            <span
+                                class="font-bold text-sm">{{ substr(Auth::user()->nama ?? Auth::user()->username ?? 'U', 0, 1) }}</span>
                         </div>
                         <div class="flex flex-col min-w-0">
                             <p class="text-xs font-bold text-white truncate">
@@ -194,9 +244,13 @@
 
                     <form method="POST" action="{{ route('logout') }}" id="sidebar-logout-form">
                         @csrf
-                        <button type="submit" class="p-2 rounded-lg text-primary-300 hover:text-white hover:bg-red-500/80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400" title="Keluar">
+                        <button type="submit"
+                            class="p-2 rounded-lg text-primary-300 hover:text-white hover:bg-red-500/80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400"
+                            title="Keluar">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
                             </svg>
                         </button>
                     </form>
@@ -206,35 +260,43 @@
 
         <main class="flex-1 md:ml-72 min-h-screen flex flex-col transition-all duration-300 w-full">
 
-            <div class="md:hidden h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sticky top-0 z-30">
+            <div
+                class="md:hidden h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sticky top-0 z-30">
                 <div class="flex items-center gap-2 group">
                     {{-- LOGO CONTAINER MOBILE --}}
                     <div class="relative w-8 h-8 flex items-center justify-center">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-lg blur opacity-40 group-hover:opacity-80 transition-all duration-500"></div>
-                        <div class="relative w-full h-full bg-black border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none"></div>
-                            <img src="{{ asset('images/logo-gibs.png') }}"
-                                alt="Logo GIBS"
+                        <div
+                            class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-lg blur opacity-40 group-hover:opacity-80 transition-all duration-500">
+                        </div>
+                        <div
+                            class="relative w-full h-full bg-black border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div
+                                class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent z-20 pointer-events-none">
+                            </div>
+                            <img src="{{ asset('images/logo-gibs.png') }}" alt="Logo GIBS"
                                 class="relative z-10 w-full h-full object-cover">
                         </div>
                     </div>
                     <span class="font-bold text-lg text-gray-900 tracking-tight">PORTAL ABSENSI</span>
                 </div>
-                <button onclick="toggleSidebar()" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition-colors focus:outline-none">
+                <button onclick="toggleSidebar()"
+                    class="p-2 text-gray-500 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition-colors focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
                     </svg>
                 </button>
             </div>
 
             @if (isset($header))
-            <header class="bg-white border-b border-gray-100 sticky top-0 z-20 hidden md:block shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
-                <div class="max-w-[85rem] mx-auto py-5 px-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center justify-between">
-                        {{ $header }}
+                <header
+                    class="bg-white border-b border-gray-100 sticky top-0 z-20 hidden md:block shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+                    <div class="max-w-[85rem] mx-auto py-5 px-4 sm:px-6 lg:px-8">
+                        <div class="flex items-center justify-between">
+                            {{ $header }}
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
             @endif
 
             <div class="flex-1 fade-in p-4 sm:p-6 lg:p-2">
@@ -244,7 +306,8 @@
             <footer class="py-6 mt-auto border-t border-gray-100 bg-white md:bg-transparent">
                 <div class="max-w-[85rem] mx-auto px-4 text-center">
                     <p class="text-xs font-medium text-gray-400">
-                        &copy; {{ date('Y') }} <span class="text-primary-600 font-bold">Portal GIBS</span> - Modul Absensi.
+                        &copy; {{ date('Y') }} <span class="text-primary-600 font-bold">Portal GIBS</span> - Modul
+                        Absensi.
                     </p>
                 </div>
             </footer>
@@ -266,39 +329,39 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Notifications
             @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: "{{ session('success') }}",
-                showConfirmButton: false,
-                timer: 3000,
-                toast: true,
-                position: 'top-end'
-            });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    toast: true,
+                    position: 'top-end'
+                });
             @endif
             @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: "{{ session('error') }}",
-                confirmButtonColor: '#EF4444'
-            });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#EF4444'
+                });
             @endif
             @if(session('warning'))
-            Swal.fire({
-                icon: 'warning',
-                title: 'Perhatian',
-                text: "{{ session('warning') }}",
-                confirmButtonColor: '#F59E0B'
-            });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perhatian',
+                    text: "{{ session('warning') }}",
+                    confirmButtonColor: '#F59E0B'
+                });
             @endif
         });
 
         // Logout Confirmation
-        document.addEventListener('submit', function(e) {
+        document.addEventListener('submit', function (e) {
             if (e.target && e.target.action && e.target.action.includes('logout')) {
                 e.preventDefault();
                 Swal.fire({
