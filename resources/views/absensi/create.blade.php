@@ -114,7 +114,8 @@
 
         /* Hari Ini (Today) */
         .flatpickr-day.today {
-            border: 2px solid #f59e0b !important; /* Warna Amber/Orange biar menonjol */
+            border: 2px solid #f59e0b !important;
+            /* Warna Amber/Orange biar menonjol */
             color: #d97706 !important;
             font-weight: 800;
             background: #fffbeb;
@@ -137,7 +138,7 @@
     </style>
 
     @php
-    \Carbon\Carbon::setLocale('id');
+        \Carbon\Carbon::setLocale('id');
     @endphp
 
     <div class="py-2">
@@ -157,26 +158,29 @@
 
                             <div class="mb-8">
                                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
+                                    <span
+                                        class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
                                     Pilih Periode
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="text-xs font-bold text-gray-500 uppercase">Bulan</label>
-                                        <select id="bulan" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
+                                        <select id="bulan"
+                                            class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
                                             @foreach(range(1, 12) as $m)
-                                            <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
-                                                {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
-                                            </option>
+                                                <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div>
                                         <label class="text-xs font-bold text-gray-500 uppercase">Tahun</label>
-                                        <select id="tahun" class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
+                                        <select id="tahun"
+                                            class="mt-1 block w-full rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 transition-all filter-trigger cursor-pointer">
                                             @php $cy = date('Y'); @endphp
                                             <option value="{{ $cy }}">{{ $cy }}</option>
-                                            <option value="{{ $cy-1 }}">{{ $cy-1 }}</option>
+                                            <option value="{{ $cy - 1 }}">{{ $cy - 1 }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -186,76 +190,70 @@
 
                             <div>
                                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
+                                    <span
+                                        class="bg-primary-100 text-primary-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
                                     Pilih Kelas & Mapel
                                 </h3>
 
                                 @if(isset($kelompok_jadwal) && count($kelompok_jadwal) > 0)
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    @foreach($kelompok_jadwal as $group)
-                                    @php
-                                    $jadwal_utama = $group->first();
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        @foreach($kelompok_jadwal as $group)
+                                            @php
+                                                $jadwal_utama = $group->first();
 
-                                    // Pengecekan Kelas atau Major
-                                    if ($jadwal_utama->id_major) {
-                                    $idTarget = $jadwal_utama->id_major;
-                                    $namaRuangKelas = $jadwal_utama->major->nama_major ?? 'Major Tidak Diketahui';
-                                    $tipeJadwal = 'major';
-                                    } else {
-                                    $idTarget = $jadwal_utama->id_kelas;
-                                    $namaRuangKelas = $jadwal_utama->kelas->nama_kelas ?? 'Kelas Tidak Diketahui';
-                                    $tipeJadwal = 'kelas';
-                                    }
-                                    @endphp
+                                                // Pengecekan Kelas atau Major
+                                                if ($jadwal_utama->id_major) {
+                                                    $idTarget = $jadwal_utama->id_major;
+                                                    $namaRuangKelas = $jadwal_utama->major->nama_major ?? 'Major Tidak Diketahui';
+                                                    $tipeJadwal = 'major';
+                                                } else {
+                                                    $idTarget = $jadwal_utama->id_kelas;
+                                                    $namaRuangKelas = $jadwal_utama->kelas->nama_kelas ?? 'Kelas Tidak Diketahui';
+                                                    $tipeJadwal = 'kelas';
+                                                }
+                                            @endphp
 
-                                    <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-400 hover:bg-gradient-to-br hover:from-white hover:to-primary-50/30 hover:shadow-[0_12px_35px_-12px_rgba(58,176,158,0.25)] hover:-translate-y-1.5 rounded-[20px] p-6 transition-all duration-300 relative overflow-hidden flex flex-col h-full"
-                                        onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $idTarget }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $namaRuangKelas }}', '{{ $tipeJadwal }}')">
+                                            <div class="jadwal-card group cursor-pointer bg-white border border-gray-200 hover:border-primary-400 hover:bg-primary-50/50 rounded-xl p-5 transition-all duration-200 relative flex flex-col h-full"
+                                                onclick="pilihJadwal(this, '{{ $jadwal_utama->id_mapel }}', '{{ $idTarget }}', '{{ $jadwal_utama->mapel->nama_mapel }}', '{{ $namaRuangKelas }}', '{{ $tipeJadwal }}')">
 
-                                        <!-- Watermark Elegan Muncul Saat Hover -->
-                                        <div class="absolute -top-4 -right-4 p-4 opacity-0 group-hover:opacity-[0.03] transition-all duration-500 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0 pointer-events-none">
-                                            <svg class="w-36 h-36 text-primary-900" fill="currentColor" viewBox="0 0 24 24">
-                                                <!-- Ikon Buku (Book) -->
-                                                <path d="M21 4H7a2 2 0 00-2 2v12a2 2 0 002 2h14a1 1 0 001-1V5a1 1 0 00-1-1zm-1 14H7.5a.5.5 0 01-.5-.5v-11a.5.5 0 01.5-.5H20v12zM6 18H4V6h2v12z"/>
-                                            </svg>
-                                        </div>
+                                                <div class="flex justify-between items-start mb-3">
+                                                    <span
+                                                        class="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-md group-hover:bg-white group-hover:text-primary-600 border border-transparent group-hover:border-primary-200 transition-colors">
+                                                        {{ $namaRuangKelas }}
+                                                    </span>
 
-                                        <div class="relative z-10 flex flex-col flex-1">
-                                            <div class="flex-1 mb-5">
-                                                <div class="flex items-start justify-between gap-4">
-                                                    <div class="w-full">
-                                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-3 border border-gray-200 shadow-sm transition-all duration-300 group-hover:bg-primary-50 group-hover:text-primary-700 group-hover:border-primary-100">
-                                                            {{ $namaRuangKelas }}
-                                                        </span>
-                                                        <h4 class="text-xl font-extrabold text-gray-800 group-hover:text-primary-700 transition-colors leading-snug tracking-tight w-[85%] pr-2">
-                                                            {{ $jadwal_utama->mapel->nama_mapel }}
-                                                        </h4>
-                                                    </div>
-                                                    
-                                                    <!-- Checkmark Absolut di Pojok -->
-                                                    <div class="checkmark hidden absolute top-6 right-6 z-20 flex items-center justify-center w-8 h-8 bg-primary-500 text-white rounded-full shadow-md shrink-0 ring-4 ring-primary-50 transition-all">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                    <div
+                                                        class="checkmark hidden flex items-center justify-center w-6 h-6 bg-primary-600 text-white rounded-full shadow-sm shrink-0 transition-all">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="3" d="M5 13l4 4L19 7"></path>
                                                         </svg>
                                                     </div>
                                                 </div>
+
+                                                <div class="flex-1 mb-4">
+                                                    <h4
+                                                        class="text-lg font-bold text-gray-900 group-hover:text-primary-700 transition-colors leading-tight pr-4">
+                                                        {{ $jadwal_utama->mapel->nama_mapel }}
+                                                    </h4>
+                                                </div>
+
+                                                <div class="flex flex-wrap gap-1.5 mt-auto border-t border-gray-100 pt-3">
+                                                    @foreach($group as $slot)
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-1 rounded text-[11px] font-bold bg-gray-50 text-gray-500 border border-gray-100 group-hover:bg-white group-hover:border-primary-200 transition-colors">
+                                                            {{ $slot->hari }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                            
-                                            <!-- List Hari Lengkap Tanpa Ikon -->
-                                            <div class="pt-4 border-t border-gray-100 flex flex-wrap gap-2 items-center mt-auto">
-                                                @foreach($group as $slot)
-                                                <span class="inline-flex items-center justify-center py-1.5 px-3 rounded-lg bg-gray-50 border border-gray-100 text-xs font-bold text-gray-500 group-hover:bg-white group-hover:text-primary-600 group-hover:border-primary-200 group-hover:shadow-sm transition-all duration-300">
-                                                    {{ $slot->hari }}
-                                                </span>
-                                                @endforeach
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
-                                    @endforeach
-                                </div>
                                 @else
-                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
-                                    <p class="text-sm text-yellow-700">Anda belum memiliki jadwal mengajar.</p>
-                                </div>
+                                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                                        <p class="text-sm text-yellow-700">Anda belum memiliki jadwal mengajar.</p>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -264,29 +262,40 @@
                     <div class="lg:col-span-1">
                         <div class="sticky top-6 space-y-6">
 
-                            <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden relative">
+                            <div
+                                class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden relative">
                                 <div class="bg-gradient-to-r from-primary-500 to-primary-700 px-6 py-4">
                                     <h3 class="text-white font-bold text-lg flex items-center gap-2">
-                                        <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
                                         </svg>
                                         Pilih Tanggal
                                     </h3>
-                                    <p class="text-primary-100 text-xs mt-1">Hanya tanggal jadwal aktif yang bisa dipilih.</p>
+                                    <p class="text-primary-100 text-xs mt-1">Hanya tanggal jadwal aktif yang bisa
+                                        dipilih.</p>
                                 </div>
 
                                 <div class="p-4 relative min-h-[340px]">
-                                    <div id="loading-indicator" class="hidden absolute inset-0 z-20 bg-white/90 backdrop-blur-[1px] flex flex-col items-center justify-center transition-all duration-300">
-                                        <div class="w-10 h-10 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin mb-3"></div>
-                                        <span class="text-xs font-bold text-gray-500 animate-pulse">Mengecek Jadwal...</span>
+                                    <div id="loading-indicator"
+                                        class="hidden absolute inset-0 z-20 bg-white/90 backdrop-blur-[1px] flex flex-col items-center justify-center transition-all duration-300">
+                                        <div
+                                            class="w-10 h-10 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin mb-3">
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-500 animate-pulse">Mengecek
+                                            Jadwal...</span>
                                     </div>
 
                                     <input type="text" name="tanggal" id="tanggal" class="hidden">
                                 </div>
 
-                                <div class="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+                                <div
+                                    class="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
                                     <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-gray-200 border border-gray-300"></span>
+                                        <span
+                                            class="w-2.5 h-2.5 rounded-full bg-gray-200 border border-gray-300"></span>
                                         <span>Kosong</span>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -298,11 +307,16 @@
 
                             <div id="calendar-status" class="text-center text-xs h-4"></div>
 
-                            <div id="selection-preview" class="hidden transition-all duration-500 transform translate-y-4 opacity-0">
-                                <div class="bg-white rounded-2xl p-5 border border-primary-100 shadow-sm relative overflow-hidden">
-                                    <div class="absolute top-0 right-0 w-16 h-16 bg-primary-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                            <div id="selection-preview"
+                                class="hidden transition-all duration-500 transform translate-y-4 opacity-0">
+                                <div
+                                    class="bg-white rounded-2xl p-5 border border-primary-100 shadow-sm relative overflow-hidden">
+                                    <div
+                                        class="absolute top-0 right-0 w-16 h-16 bg-primary-50 rounded-bl-full -mr-4 -mt-4 z-0">
+                                    </div>
                                     <div class="relative z-10">
-                                        <p class="text-xs text-primary-500 font-bold uppercase tracking-wider mb-2">Konfirmasi</p>
+                                        <p class="text-xs text-primary-500 font-bold uppercase tracking-wider mb-2">
+                                            Konfirmasi</p>
 
                                         <div class="space-y-1 mb-4">
                                             <div class="flex justify-between items-end border-b border-gray-100 pb-2">
@@ -311,7 +325,8 @@
                                             </div>
                                             <div class="flex justify-between items-end border-b border-gray-100 pb-2">
                                                 <span class="text-gray-500 text-sm">Mapel</span>
-                                                <span class="font-bold text-gray-900 text-right w-2/3 truncate" id="preview-mapel">-</span>
+                                                <span class="font-bold text-gray-900 text-right w-2/3 truncate"
+                                                    id="preview-mapel">-</span>
                                             </div>
                                             <div class="flex justify-between items-end pt-2">
                                                 <span class="text-gray-500 text-sm">Tanggal</span>
@@ -322,8 +337,10 @@
                                         <button type="submit" id="btn-submit"
                                             class="w-full group relative flex items-center justify-center px-6 py-3.5 border border-transparent text-sm font-bold rounded-xl text-white bg-gray-900 hover:bg-primary-600 transition-all shadow-lg hover:shadow-primary-500/30">
                                             <span>Buka Absensi</span>
-                                            <svg class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            <svg class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
                                         </button>
                                     </div>
@@ -347,14 +364,18 @@
         <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
 
-                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100">
+                <div
+                    class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100">
 
                     <div class="bg-white px-6 py-8 sm:p-10">
                         <div class="flex flex-col sm:flex-row sm:items-start gap-6">
 
-                            <div class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-amber-50 sm:mx-0 ring-8 ring-amber-50/50">
-                                <svg class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            <div
+                                class="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-amber-50 sm:mx-0 ring-8 ring-amber-50/50">
+                                <svg class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                                 </svg>
                             </div>
 
@@ -387,7 +408,7 @@
         let fpInstance;
         const serverDateToday = "{{ \Carbon\Carbon::now()->format('Y-m-d') }}";
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // --- 1. PINDAHKAN MODAL KE BODY AGAR FULL SCREEN & DI ATAS SIDEBAR ---
             const modalEl = document.getElementById('warning-modal');
             if (modalEl) {
@@ -402,7 +423,7 @@
                 dateFormat: "Y-m-d",
                 inline: true,
                 animate: true,
-                onChange: function(selectedDates, dateStr) {
+                onChange: function (selectedDates, dateStr) {
                     // Cek Tanggal Masa Depan
                     if (dateStr > serverDateToday) {
                         showWarningModal(dateStr);
@@ -420,7 +441,7 @@
 
             // Event Listener Filter
             document.querySelectorAll('.filter-trigger').forEach(el => {
-                el.addEventListener('change', function() {
+                el.addEventListener('change', function () {
                     const bulan = document.getElementById('bulan').value;
                     const tahun = document.getElementById('tahun').value;
 
