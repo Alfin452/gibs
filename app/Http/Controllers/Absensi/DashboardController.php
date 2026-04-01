@@ -36,10 +36,18 @@ class DashboardController extends Controller
 
         // --- DATA STATISTIK ---
         $jadwal_semua = Jadwal::where('id_guru', $id_guru)->get();
-        $total_kelas = $jadwal_semua->pluck('id_kelas')->unique()->count();
+        
+        // PERBAIKAN: Hitung total kelas dengan membedakan antara id_kelas dan id_major
+        $total_kelas = $jadwal_semua->map(function ($jadwal) {
+            return $jadwal->id_major ? 'M_' . $jadwal->id_major : 'K_' . $jadwal->id_kelas;
+        })->filter(function ($item) {
+            return $item !== 'M_' && $item !== 'K_'; // Memastikan data yang kosong/null tidak ikut terhitung
+        })->unique()->count();
+
         $total_mapel = $jadwal_semua->pluck('id_mapel')->unique()->count();
 
-        $kelas_ids = $jadwal_semua->pluck('id_kelas')->unique();
+        // Tambahkan filter() agar nilai null dari jadwal major tidak ikut masuk ke query whereIn
+        $kelas_ids = $jadwal_semua->pluck('id_kelas')->filter()->unique();
         $total_siswa = Siswa::whereIn('id_kelas', $kelas_ids)->count();
 
         $kelas_hrt = null;
