@@ -341,10 +341,10 @@
         </div>
     </div>
 
-    <div id="warning-modal" class="relative z- hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="warning-modal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity"></div>
 
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
 
                 <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-3xl border border-gray-100">
