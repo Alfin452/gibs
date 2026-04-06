@@ -12,6 +12,11 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    /**
+     * Dashboard Index
+     * 
+     * @return \Illuminate\Contracts\View\View
+     */
     public function index()
     {
         Carbon::setLocale('id');

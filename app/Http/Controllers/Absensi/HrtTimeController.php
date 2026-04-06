@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\KehadiranHrt;
 use App\Models\Siswa;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\TahunAjar; 
+use App\Models\TahunAjar;
 
 class HrtTimeController extends Controller
 {
@@ -135,7 +135,7 @@ class HrtTimeController extends Controller
             5 => 147,
             6 => 184
         ];
-
+ 
         if (!isset($startCols[$bulan])) {
             return back()->with('error', 'Format bulan ini belum disetting untuk import otomatis (Hanya Jan-Jun).');
         }
@@ -151,11 +151,13 @@ class HrtTimeController extends Controller
 
         foreach ($data as $rowIndex => $row) {
             // Lewati baris header (Baris ke 1 dan 2)
-            if ($rowIndex < 2) continue;
+            if ($rowIndex < 2)
+                continue;
 
             // Kolom 'NAME' ada di index 1
             $nama_siswa = trim($row[1] ?? '');
-            if (empty($nama_siswa)) continue;
+            if (empty($nama_siswa))
+                continue;
 
             // Cari siswa berdasarkan nama
             $siswa = Siswa::where('id_kelas', $id_kelas)
@@ -170,11 +172,16 @@ class HrtTimeController extends Controller
 
                     // MAPPING: 1->H, a->A, p->I, s->S
                     $status = null;
-                    if ($val === '1' || $val === 'h') $status = 'H';
-                    elseif ($val === 'a') $status = 'A';
-                    elseif ($val === 'p' || $val === 'i') $status = 'I';
-                    elseif ($val === 's') $status = 'S';
-                    elseif ($val === 'l') $status = 'L';
+                    if ($val === '1' || $val === 'h')
+                        $status = 'H';
+                    elseif ($val === 'a')
+                        $status = 'A';
+                    elseif ($val === 'p' || $val === 'i')
+                        $status = 'I';
+                    elseif ($val === 's')
+                        $status = 'S';
+                    elseif ($val === 'l')
+                        $status = 'L';
 
                     if ($status) {
                         KehadiranHrt::updateOrCreate(
