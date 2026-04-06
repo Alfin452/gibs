@@ -34,7 +34,8 @@ class AbsensiController extends Controller
             \Illuminate\Support\Facades\DB::raw('SUM(CASE WHEN status = "A" THEN 1 ELSE 0 END) as alpha'),
             \Illuminate\Support\Facades\DB::raw('SUM(CASE WHEN status = "L" THEN 1 ELSE 0 END) as libur')
         )
-            ->with(['kelas', 'mapel'])
+            // Tambahkan 'major' di dalam with()
+            ->with(['kelas', 'mapel', 'major'])
             ->groupBy('tanggal', 'id_kelas', 'id_major', 'id_mapel', 'id_guru')
             ->orderBy('tanggal', 'desc');
 
@@ -56,6 +57,10 @@ class AbsensiController extends Controller
                 $q->whereHas('kelas', function ($k) use ($search) {
                     $k->where('nama_kelas', 'like', "%{$search}%");
                 })
+                    // Tambahkan pencarian untuk relasi major di sini
+                    ->orWhereHas('major', function ($mj) use ($search) {
+                        $mj->where('nama_major', 'like', "%{$search}%");
+                    })
                     ->orWhereHas('mapel', function ($m) use ($search) {
                         $m->where('nama_mapel', 'like', "%{$search}%");
                     });
@@ -63,7 +68,6 @@ class AbsensiController extends Controller
         }
 
         $riwayat = $query->paginate(10)->withQueryString();
-
         // --- PERBAIKAN DROPDOWN ---
         $jadwal_guru = \App\Models\Jadwal::where('id_guru', $id_guru)->with(['mapel', 'kelas', 'major'])->get();
 

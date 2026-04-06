@@ -23,4 +23,9 @@ class KehadiranHarian extends Model
     {
         return $this->belongsTo(Kelas::class, 'id_kelas', 'id_kelas');
     }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class, 'id_major', 'id_major');
+    }
 }
