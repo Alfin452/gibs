@@ -34,7 +34,8 @@ class AbsensiController extends Controller
             \Illuminate\Support\Facades\DB::raw('SUM(CASE WHEN status = "A" THEN 1 ELSE 0 END) as alpha'),
             \Illuminate\Support\Facades\DB::raw('SUM(CASE WHEN status = "L" THEN 1 ELSE 0 END) as libur')
         )
-            ->with(['kelas', 'mapel'])
+            // Tambahkan 'major' di dalam with()
+            ->with(['kelas', 'mapel', 'major'])
             ->groupBy('tanggal', 'id_kelas', 'id_major', 'id_mapel', 'id_guru')
             ->orderBy('tanggal', 'desc');
 
@@ -56,6 +57,10 @@ class AbsensiController extends Controller
                 $q->whereHas('kelas', function ($k) use ($search) {
                     $k->where('nama_kelas', 'like', "%{$search}%");
                 })
+                    // Tambahkan pencarian untuk relasi major di sini
+                    ->orWhereHas('major', function ($mj) use ($search) {
+                        $mj->where('nama_major', 'like', "%{$search}%");
+                    })
                     ->orWhereHas('mapel', function ($m) use ($search) {
                         $m->where('nama_mapel', 'like', "%{$search}%");
                     });
@@ -63,7 +68,6 @@ class AbsensiController extends Controller
         }
 
         $riwayat = $query->paginate(10)->withQueryString();
-
         // --- PERBAIKAN DROPDOWN ---
         $jadwal_guru = \App\Models\Jadwal::where('id_guru', $id_guru)->with(['mapel', 'kelas', 'major'])->get();
 
@@ -122,7 +126,6 @@ class AbsensiController extends Controller
 
         return view('absensi.create', compact('kelompok_jadwal'));
     }
-
 
     public function store(Request $request)
     {
@@ -187,13 +190,13 @@ class AbsensiController extends Controller
                 \Illuminate\Support\Facades\DB::table('sakit_siswa')
                     ->whereIn('id_siswa', $siswa_hadir_ids)
                     ->where('status_akhir', 'Masih Sakit')
+                    ->whereDate('tanggal', $request->tanggal)
                     ->update([
                         'status_akhir' => 'Kembali ke Kelas',
                         'updated_at' => now()
                     ]);
             }
 
-            // Panggil fungsi rekap bulanan dengan parameter id_major tambahan
             $this->updateRekapBulananMassal($all_siswa_ids, $request->id_mapel, $request->id_kelas ?: null, $request->id_major ?: null, $id_tahun_ajar, $request->tanggal, $id_guru);
 
             \Illuminate\Support\Facades\DB::commit();
@@ -201,7 +204,6 @@ class AbsensiController extends Controller
             return redirect()->route('absensi.index')->with('success', 'Absensi berhasil disimpan dan disinkronkan!');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollback();
-            // Menampilkan letak error aslinya agar tidak redirect ke halaman Method Not Allowed
             return redirect()->route('absensi.index')->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
     }
@@ -248,26 +250,22 @@ class AbsensiController extends Controller
         }
 
         $tanggal_absen = \Carbon\Carbon::parse($tanggal)->startOfDay();
+        $tanggal_pencarian = $tanggal_absen->toDateString();
 
         $siswa_masih_sakit_db = \Illuminate\Support\Facades\DB::table('sakit_siswa')
             ->where('status_akhir', 'Masih Sakit')
-            ->where('tanggal', '<=', $tanggal)
+            ->where('tanggal', $tanggal_pencarian)
             ->get();
 
         $siswa_masih_sakit = collect();
         foreach ($siswa_masih_sakit_db as $sakit) {
-            $tgl_mulai = \Carbon\Carbon::parse($sakit->tanggal)->startOfDay();
-            $hari_sakit = 0;
-            for ($date = $tgl_mulai->copy(); $date->lte($tanggal_absen); $date->addDay()) {
-                if (!$date->isSunday()) $hari_sakit++;
-            }
-            $sakit->durasi_hari = $hari_sakit;
+            $sakit->durasi_hari = 1;
             $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
         }
 
         $siswa_baru_sembuh_db = \Illuminate\Support\Facades\DB::table('sakit_siswa')
             ->where('status_akhir', 'Kembali ke Kelas')
-            ->whereDate('updated_at', \Carbon\Carbon::parse($tanggal)->toDateString())
+            ->where('tanggal', $tanggal_pencarian)
             ->get();
 
         $siswa_baru_sembuh = collect();
@@ -478,14 +476,13 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda tidak dapat melakukan absensi untuk tanggal di masa depan (Waktu Server).');
         }
 
-        // Pecah string value menjadi 3 bagian (Tipe - ID Target - ID Mapel)
         $ids = explode('-', $request->kombinasi_jadwal);
 
         if (count($ids) !== 3) {
             return back()->with('error', 'Format jadwal tidak valid.');
         }
 
-        // Ambil data menggunakan indeks array yang benar [0], [1], [2]
+        // Ambil data menggunakan indeks array yang benar,,
         $tipe = trim(strtolower((string) $ids[0]));
         $id_target = trim((string) $ids[1]);
         $id_mapel = trim((string) $ids[2]);
@@ -514,7 +511,6 @@ class AbsensiController extends Controller
             $siswa = \App\Models\Siswa::where('id_major', $id_target)->orderBy('nama_siswa', 'asc')->get();
             $major = \App\Models\Major::find($id_target);
 
-            // PERBAIKAN: Menambahkan id_major ke dalam object agar bisa dibaca oleh form.blade.php
             $infoKelas = (object) [
                 'id_kelas' => null,
                 'id_major' => $id_target,
@@ -527,30 +523,24 @@ class AbsensiController extends Controller
 
         $infoMapel = \App\Models\Mapel::find($id_mapel);
         $tanggal_absen = \Carbon\Carbon::parse($tanggal)->startOfDay();
+        $tanggal_pencarian = $tanggal_absen->toDateString();
 
-        // 1. Siswa yang MASIH SAKIT (Belum ada yang meng-absen H)
         $siswa_masih_sakit_db = \Illuminate\Support\Facades\DB::table('sakit_siswa')
             ->where('status_akhir', 'Masih Sakit')
-            ->where('tanggal', '<=', $tanggal)
+            ->where('tanggal', $tanggal_pencarian)
             ->get();
 
         $siswa_masih_sakit = collect();
         foreach ($siswa_masih_sakit_db as $sakit) {
-            $tgl_mulai = \Carbon\Carbon::parse($sakit->tanggal)->startOfDay();
-            $hari_sakit = 0;
-            for ($date = $tgl_mulai->copy(); $date->lte($tanggal_absen); $date->addDay()) {
-                if (!$date->isSunday()) $hari_sakit++;
-            }
-            $sakit->durasi_hari = $hari_sakit;
+            $sakit->durasi_hari = 1;
             $siswa_masih_sakit->put($sakit->id_siswa, $sakit);
         }
 
-        // 2. Siswa yang BARU SEMBUH HARI INI
         $siswa_baru_sembuh_db = \Illuminate\Support\Facades\DB::table('sakit_siswa')
             ->where('status_akhir', 'Kembali ke Kelas')
-            ->whereDate('updated_at', \Carbon\Carbon::parse($tanggal)->toDateString())
+            ->where('tanggal', $tanggal_pencarian)
             ->get();
-
+            
         $siswa_baru_sembuh = collect();
         foreach ($siswa_baru_sembuh_db as $sembuh) {
             $konfirmasi = \Illuminate\Support\Facades\DB::table('kehadiran_harian')

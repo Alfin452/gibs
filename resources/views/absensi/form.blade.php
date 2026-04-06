@@ -85,18 +85,24 @@
                             $is_sakit_klinik = isset($siswa_masih_sakit) && $siswa_masih_sakit->has($s->id_siswa);
 
                             if (isset($dataKehadiran) && isset($dataKehadiran[$s->id_siswa])) {
-                            // MODE EDIT
-                            $statusDB = $dataKehadiran[$s->id_siswa]->status;
-                            $ketDB = $dataKehadiran[$s->id_siswa]->keterangan;
+                                // MODE EDIT
+                                $statusDB = $dataKehadiran[$s->id_siswa]->status;
+                                $ketDB = $dataKehadiran[$s->id_siswa]->keterangan;
+                                
+                                // FIX: PAKSA MENJADI 'S' JIKA KLINIK MENYATAKAN SAKIT, MESKIPUN GURU SUDAH PERNAH MENGABSEN
+                                if ($is_sakit_klinik && $statusDB !== 'S') {
+                                    $statusDB = 'S';
+                                    $ketDB = $siswa_masih_sakit[$s->id_siswa]->keterangan;
+                                }
                             } else {
-                            // FORM BARU
-                            if ($is_sakit_klinik) {
-                            $statusDB = 'S'; // Otomatis diset Sakit
-                            $ketDB = $siswa_masih_sakit[$s->id_siswa]->keterangan; // Keluhan otomatis
-                            } else {
-                            $statusDB = 'H'; // Default Hadir (Termasuk untuk yang sudah sembuh)
-                            $ketDB = '';
-                            }
+                                // FORM BARU
+                                if ($is_sakit_klinik) {
+                                    $statusDB = 'S'; // Otomatis diset Sakit
+                                    $ketDB = $siswa_masih_sakit[$s->id_siswa]->keterangan; // Keluhan otomatis
+                                } else {
+                                    $statusDB = 'H'; // Default Hadir (Termasuk untuk yang sudah sembuh)
+                                    $ketDB = '';
+                                }
                             }
                             @endphp
 
